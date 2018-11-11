@@ -1,37 +1,27 @@
-"""
-Simple PyWren example using the map_reduce method.
-
-In this example the map_reduce() method will launch one
-map function for each entry in 'iterdata', and then it will
-wait locally for the results. Once the results be ready, it
-will launch the reduce function.
-"""
 import pywren_ibm_cloud as pywren
 from random import random
+from time import time
+ACTIONS = 1000
+PER_ACTION = 10000000
+print("Total points is: " + str(PER_ACTION * ACTIONS))
 
-ACTIONS = 55
-PER_ACTION = 1009000
-
-iterdata = [False] * ACTIONS
+iterdata = [0] * ACTIONS
 
 
 def my_map_function(curr):
-    points = []
+    total_in_circle = 0
     for i in range(PER_ACTION):
         x = random()
         y = random()
-        points.append((x ** 2) + (y ** 2) <= 1)
-    return points
+        total_in_circle += ((x ** 2) + (y ** 2) <= 1)
+    return float(total_in_circle / PER_ACTION)
 
 
 def my_reduce_function(results):
-    in_circle = 0
-    num_samples = 0
+    sumPI = 0
     for map_result in results:
-        for res in map_result:
-            in_circle = in_circle + int(res)
-            num_samples += 1
-    return float(4 * (in_circle / num_samples))
+        sumPI += map_result
+    return float(4 * (sumPI / ACTIONS))
 
 
 """
@@ -41,7 +31,11 @@ the results remotely.
 # for i in range(len(iterdata)):
 #     iterdata[i] = my_map_function(iterdata[i])
 # print(my_reduce_function(iterdata))
-
+start_time = time()
 pw = pywren.ibm_cf_executor()
 pw.map_reduce(my_map_function, iterdata, my_reduce_function, reducer_wait_local=False)
-print(pw.get_result())
+PI = pw.get_result()
+print("Amortized PI is: ")
+print(PI)
+elapsed = time()
+print("\nDuration: " + str(elapsed - start_time) + " Sec")
