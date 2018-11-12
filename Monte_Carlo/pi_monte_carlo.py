@@ -31,6 +31,7 @@ the results remotely.
 # for i in range(len(iterdata)):
 #     iterdata[i] = my_map_function(iterdata[i])
 # print(my_reduce_function(iterdata))
+
 start_time = time()
 pw = pywren.ibm_cf_executor()
 pw.map_reduce(my_map_function, iterdata, my_reduce_function, reducer_wait_local=False)

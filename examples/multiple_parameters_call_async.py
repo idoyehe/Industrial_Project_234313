@@ -64,7 +64,7 @@ def sum_list_mult(list_of_numbers, x):
 
 pw = pywren.ibm_cf_executor()
 pw.call_async(sum_list_mult, params)
-print(pw.get_result())
+print (pw.get_result())
 
 """
 Or alternatively
