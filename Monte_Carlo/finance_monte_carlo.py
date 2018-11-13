@@ -5,16 +5,16 @@ from math import exp
 from scipy.stats import norm
 from numpy import median
 
-ACTIONS = 3000
+ACTIONS = 5000
 TOTAL = ACTIONS
 print("Total Random Samples is: " + str(TOTAL))
 
-gold = {"drift": -0.000303176, "std_dev": 0.010932347, "last_price": 1296.5, "days_2_predict": 219}
-mlnx = {"drift": -0.001456883, "std_dev": 0.03030907, "last_price": 64.7, "days_2_predict": 219}
-ibm = {"drift": -0.000373122, "std_dev": 0.013124508, "last_price": 153.42, "days_2_predict": 219}
-nvda = {"drift": -0.001649822, "std_dev": 0.026708365, "last_price": 193.5, "days_2_predict": 219}
+gold = {"drift": 0.000142559, "std_dev": 0.010561899, "last_price": 1296.5, "days_2_predict": 219}
+mlnx = {"drift": 0.000581742829, "std_dev": 0.029879238, "last_price": 64.7, "days_2_predict": 219}
+ibm = {"drift": 0.000091967236, "std_dev": 0.012404562, "last_price": 153.42, "days_2_predict": 219}
+nvda = {"drift": 0.000936809, "std_dev": 0.027145343, "last_price": 193.5, "days_2_predict": 219}
 
-STOCK_DATA = gold
+STOCK_DATA = nvda
 
 iterdata = [[]] * ACTIONS
 
@@ -41,8 +41,8 @@ Set 'reducer_wait_local=False' to launch the reducer and wait for
 the results remotely.
 """
 
-# FLAG = "LOCAL"
-FLAG = "CLOUD"
+FLAG = "LOCAL"
+# FLAG = "CLOUD"
 if FLAG == "LOCAL":
     start_time = time()
     for i in range(ACTIONS):
