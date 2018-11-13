@@ -5,32 +5,41 @@ from math import exp
 from scipy.stats import norm
 from numpy import median
 
-ACTIONS = 5000
+
+class StockData:
+    def __init__(self, name, drift, std_dev, last_value, days2predict):
+        self.name = name
+        self.days2predict = days2predict
+        self.last_value = last_value
+        self.std_dev = std_dev
+        self.drift = drift
+
+    def prediction(self):
+        predicts_est = [self.last_value]
+        for predict in range(1, self.days2predict + 1):
+            rand = random()
+            pow_r = norm.ppf(rand)
+            predicts_est.append(predicts_est[predict - 1] * exp(self.drift + (self.std_dev * pow_r)))
+        return predicts_est
+
+
+ACTIONS = 2000
 TOTAL = ACTIONS
 print("Total Random Samples is: " + str(TOTAL))
 
-gold = {"drift": 0.000142559, "std_dev": 0.010561899, "last_price": 1296.5, "days_2_predict": 219}
-mlnx = {"drift": 0.000581742829, "std_dev": 0.029879238, "last_price": 64.7, "days_2_predict": 219}
-ibm = {"drift": 0.000091967236, "std_dev": 0.012404562, "last_price": 153.42, "days_2_predict": 219}
-nvda = {"drift": 0.000936809, "std_dev": 0.027145343, "last_price": 193.5, "days_2_predict": 219}
+gold = StockData(name="GOLD", drift=0.000142559, std_dev=0.010561899, last_value=1296.5, days2predict=219)
+mlnx = StockData(name="Mellanox", drift=0.000581742829, std_dev=0.029879238, last_value=64.7, days2predict=219)
+ibm = StockData(name="IBM", drift=0.000091967236, std_dev=0.012404562, last_value=153.42, days2predict=219)
+nvda = StockData(name="Nvdia", drift=0.000936809, std_dev=0.027145343, last_value=193.5, days2predict=219)
 
-STOCK_DATA = nvda
+stock = gold
 
 iterdata = [[]] * ACTIONS
 
 
 def my_map_function():
-    std_dev = STOCK_DATA["std_dev"]
-    drift = STOCK_DATA["drift"]
-    last_price = STOCK_DATA["last_price"]
-    days_2_predict = STOCK_DATA["days_2_predict"]
-    predicts_est = [0] * (days_2_predict + 1)
-    predicts_est[0] = last_price
-    for predict in range(1, days_2_predict + 1):
-        rand = random()
-        pow_r = norm.ppf(rand)
-        predicts_est[predict] = predicts_est[predict - 1] * exp(drift + (std_dev * pow_r))
-    return predicts_est
+    return stock.prediction()
+
 
 def my_reduce_function(list_of_lists):
     return [median(x) for x in zip(*list_of_lists)]
@@ -41,8 +50,8 @@ Set 'reducer_wait_local=False' to launch the reducer and wait for
 the results remotely.
 """
 
-FLAG = "LOCAL"
-# FLAG = "CLOUD"
+# FLAG = "LOCAL"
+FLAG = "CLOUD"
 if FLAG == "LOCAL":
     start_time = time()
     for i in range(ACTIONS):
