@@ -41,8 +41,8 @@ Set 'reducer_wait_local=False' to launch the reducer and wait for
 the results remotely.
 """
 
-FLAG = "LOCAL"
-# FLAG = "CLOUD"
+# FLAG = "LOCAL"
+FLAG = "CLOUD"
 if FLAG == "LOCAL":
     start_time = time()
     for i in range(ACTIONS):
