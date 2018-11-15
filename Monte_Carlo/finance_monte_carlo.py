@@ -1,15 +1,17 @@
-from numpy import exp, random
+from numpy import exp, random, ones_like
 import matplotlib.pyplot as plt
 from scipy.stats import norm
 from ExecuterWrapper.executerWrapper import ExecuterWrap, Location
 
+exe_location = Location.LOCAL
+
 
 class StockData:
-    total_forecasts = 10
+    total_forecasts = 100
+    days2predict = 1095
 
-    def __init__(self, name, drift, std_dev, last_value, days2predict):
+    def __init__(self, name, drift, std_dev, last_value):
         self.name = name
-        self.days2predict = days2predict
         self.last_value = last_value
         self.std_dev = std_dev
         self.drift = drift
@@ -23,10 +25,10 @@ class StockData:
         return predicts_est
 
 
-gold = StockData(name="GOLD", drift=0.000142559, std_dev=0.010561899, last_value=1296.5, days2predict=1095)
-mlnx = StockData(name="Mellanox", drift=0.000581742829, std_dev=0.029879238, last_value=64.7, days2predict=1095)
-ibm = StockData(name="IBM", drift=0.000091967236, std_dev=0.012404562, last_value=153.42, days2predict=1095)
-nvda = StockData(name="Nvdia", drift=0.000936809, std_dev=0.027145343, last_value=193.5, days2predict=1095)
+gold = StockData(name="GOLD", drift=0.000142559, std_dev=0.010561899, last_value=1296.5)
+mlnx = StockData(name="Mellanox", drift=0.000581742829, std_dev=0.029879238, last_value=64.7)
+ibm = StockData(name="IBM", drift=0.000091967236, std_dev=0.012404562, last_value=153.42)
+nvda = StockData(name="Nvdia", drift=0.000936809, std_dev=0.027145343, last_value=193.5)
 
 current_stock = gold
 print("Current Stock: " + current_stock.name)
@@ -36,7 +38,7 @@ print("Days to Predict: " + str(current_stock.days2predict))
 iterdata = [[]] * StockData.total_forecasts
 
 
-def my_map_function(curr):
+def my_map_function(curr=None):
     return current_stock.forecast()
 
 
@@ -57,7 +59,7 @@ def my_reduce_function(list_of_lists):
 
 
 executer = ExecuterWrap()
-executer.set_location(Location.CLOUD)
+executer.set_location(exe_location)
 result_obj = executer.map_reduce_execution(my_map_function, iterdata, my_reduce_function)
 
 print("Stock values minimum forecast: ")
@@ -66,19 +68,34 @@ print(result_obj["min"])
 print("Stock values maximum forecast: ")
 print(result_obj["max"])
 
+'''Minimum forecast plot'''
 plt.plot([x for x in range(current_stock.days2predict + 1)], result_obj["min"])
 plt.grid(True)
+plt.xlabel("Days")
+plt.ylabel("Value [$]")
 plt.title("Minimum Forecast")
 plt.show()
+
+'''Maximum forecast plot'''
 plt.plot([x for x in range(current_stock.days2predict + 1)], result_obj["max"])
 plt.grid(True)
 plt.title("Maximum Forecast")
+plt.xlabel("Days")
+plt.ylabel("Value [$]")
 plt.show()
-plt.hist(result_obj["hist_mid"], bins='auto', align='mid')
+
+'''Histogram for mid prediction forecast plot'''
+plt.hist(result_obj["hist_mid"])
 plt.grid(True)
 plt.title("Mid prediction period histogram")
+plt.ylabel("Count")
+plt.xlabel("Value [$]")
 plt.show()
-plt.hist(result_obj["hist_end"], bins='auto', align='mid')
+
+'''Histogram for end prediction forecast plot'''
+plt.hist(result_obj["hist_end"])
 plt.grid(True)
 plt.title("End prediction period histogram")
+plt.ylabel("Count")
+plt.xlabel("Value [$]")
 plt.show()
