@@ -1,16 +1,17 @@
-from numpy import exp, random, ones_like
+from numpy import exp, random, arange
 import matplotlib.pyplot as plt
 from scipy.stats import norm
 from ExecuterWrapper.executerWrapper import ExecuterWrap, Location
 
-exe_location = Location.LOCAL
+exe_location = Location.CLOUD
 
 
 class StockData:
-    total_forecasts = 100
+    total_forecasts = 1500
     days2predict = 1095
 
-    def __init__(self, name, drift, std_dev, last_value):
+    def __init__(self, name, drift, std_dev, last_value, ticks):
+        self.ticks = ticks
         self.name = name
         self.last_value = last_value
         self.std_dev = std_dev
@@ -25,10 +26,10 @@ class StockData:
         return predicts_est
 
 
-gold = StockData(name="GOLD", drift=0.000142559, std_dev=0.010561899, last_value=1296.5)
-mlnx = StockData(name="Mellanox", drift=0.000581742829, std_dev=0.029879238, last_value=64.7)
-ibm = StockData(name="IBM", drift=0.000091967236, std_dev=0.012404562, last_value=153.42)
-nvda = StockData(name="Nvdia", drift=0.000936809, std_dev=0.027145343, last_value=193.5)
+gold = StockData(name="GOLD", drift=0.000142559, std_dev=0.010561899, last_value=1296.5, ticks=400)
+mlnx = StockData(name="Mellanox", drift=0.000581742829, std_dev=0.029879238, last_value=64.7, ticks=10)
+ibm = StockData(name="IBM", drift=0.000091967236, std_dev=0.012404562, last_value=153.42, ticks=50)
+nvda = StockData(name="Nvdia", drift=0.000936809, std_dev=0.027145343, last_value=193.5, ticks=50)
 
 current_stock = gold
 print("Current Stock: " + current_stock.name)
@@ -69,33 +70,41 @@ print("Stock values maximum forecast: ")
 print(result_obj["max"])
 
 '''Minimum forecast plot'''
-plt.plot([x for x in range(current_stock.days2predict + 1)], result_obj["min"])
+min_forecast = result_obj["min"]
+plt.plot([x for x in range(current_stock.days2predict + 1)], min_forecast)
 plt.grid(True)
 plt.xlabel("Days")
 plt.ylabel("Value [$]")
 plt.title("Minimum Forecast")
+plt.xticks(arange(0, StockData.days2predict + 1, 150))
 plt.show()
 
 '''Maximum forecast plot'''
-plt.plot([x for x in range(current_stock.days2predict + 1)], result_obj["max"])
+max_forecast = result_obj["max"]
+plt.plot([x for x in range(current_stock.days2predict + 1)], max_forecast)
 plt.grid(True)
 plt.title("Maximum Forecast")
 plt.xlabel("Days")
 plt.ylabel("Value [$]")
+plt.xticks(arange(0, StockData.days2predict + 1, 150))
 plt.show()
 
 '''Histogram for mid prediction forecast plot'''
-plt.hist(result_obj["hist_mid"])
+mid_data = result_obj["hist_mid"]
+plt.hist(mid_data, bins='auto')
 plt.grid(True)
 plt.title("Mid prediction period histogram")
 plt.ylabel("Count")
 plt.xlabel("Value [$]")
+plt.xticks(arange(min(mid_data), max(mid_data), current_stock.ticks))
 plt.show()
 
 '''Histogram for end prediction forecast plot'''
-plt.hist(result_obj["hist_end"])
+end_data = result_obj["hist_end"]
+plt.hist(end_data, bins='auto')
 plt.grid(True)
 plt.title("End prediction period histogram")
 plt.ylabel("Count")
 plt.xlabel("Value [$]")
+plt.xticks(arange(min(end_data), max(end_data), current_stock.ticks))
 plt.show()
