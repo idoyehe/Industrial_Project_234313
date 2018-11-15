@@ -1,6 +1,8 @@
 import pywren_ibm_cloud as pywren
 from random import random
 from time import time
+from pickle import dump
+
 ACTIONS = 10000
 PER_ACTION = 1
 print("Total points is: " + str(PER_ACTION * ACTIONS))
@@ -35,8 +37,12 @@ if FLAG == "LOCAL":
 else:
     start_time = time()
     pw = pywren.ibm_cf_executor()
-    pw.map_reduce(my_map_function, iterdata, my_reduce_function, reducer_wait_local=False)
+    future = pw.map_reduce(my_map_function, iterdata, my_reduce_function, reducer_wait_local=False)
     PI = pw.get_result()
+    run_statuses = future.run_status
+    invoke_statuses = future.invoke_status
+    res = {'run_statuses': run_statuses, 'invoke_statuses': invoke_statuses}
+    dump(res, open('statuses.pickle', 'wb'), -1)
     print("Amortized PI is: ")
     print(PI)
 elapsed = time()

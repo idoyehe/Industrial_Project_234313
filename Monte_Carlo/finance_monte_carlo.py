@@ -3,7 +3,7 @@ from time import time
 from numpy import exp, random
 import matplotlib.pyplot as plt
 from scipy.stats import norm
-
+from pickle import dump
 
 class StockData:
     def __init__(self, name, drift, std_dev, last_value, days2predict):
@@ -14,7 +14,7 @@ class StockData:
         self.drift = drift
         self.forcast_length = days2predict + 1
 
-    def prediction(self):
+    def forecast(self):
         predicts_est = [self.last_value]
         for predict in range(1, self.forcast_length):
             rand = random.rand()
@@ -23,23 +23,23 @@ class StockData:
         return predicts_est
 
 
-ACTIONS = 1500
-TOTAL = ACTIONS
-print("Total Prediction: " + str(TOTAL))
+ACTIONS = 100
+total_forecasts = ACTIONS
+print("Total Forecasts: " + str(total_forecasts))
 
 gold = StockData(name="GOLD", drift=0.000142559, std_dev=0.010561899, last_value=1296.5, days2predict=1095)
 mlnx = StockData(name="Mellanox", drift=0.000581742829, std_dev=0.029879238, last_value=64.7, days2predict=1095)
 ibm = StockData(name="IBM", drift=0.000091967236, std_dev=0.012404562, last_value=153.42, days2predict=1095)
 nvda = StockData(name="Nvdia", drift=0.000936809, std_dev=0.027145343, last_value=193.5, days2predict=1095)
 
-stock = ibm
+stock = nvda
 print("Current Stock: " + stock.name)
 
 iterdata = [[]] * ACTIONS
 
 
 def my_map_function():
-    return stock.prediction()
+    return stock.forecast()
 
 
 def my_reduce_function(list_of_lists):
@@ -58,13 +58,8 @@ def my_reduce_function(list_of_lists):
     return {"min": min_forecast, "max": max_forecast, "hist_mid": hist_mid, "hist_end": hist_end}
 
 
-"""
-Set 'reducer_wait_local=False' to launch the reducer and wait for
-the results remotely.
-"""
-
-# FLAG = "LOCAL"
-FLAG = "CLOUD"
+FLAG = "LOCAL"
+# FLAG = "CLOUD"
 if FLAG == "LOCAL":
     start_time = time()
     for i in range(ACTIONS):
@@ -73,8 +68,12 @@ if FLAG == "LOCAL":
 else:
     start_time = time()
     pw = pywren.ibm_cf_executor()
-    pw.map_reduce(my_map_function, iterdata, my_reduce_function, reducer_wait_local=False)
+    future = pw.map_reduce(my_map_function, iterdata, my_reduce_function, reducer_wait_local=False)
     result_list = pw.get_result()
+    run_statuses = future.run_status
+    invoke_statuses = future.invoke_status
+    res = {'run_statuses': run_statuses, 'invoke_statuses': invoke_statuses}
+    dump(res, open('statuses.pickle', 'wb'), -1)
 
 elapsed = time()
 print("\nDuration: " + str(elapsed - start_time) + " Sec")
@@ -86,14 +85,18 @@ print("Stock values maximum forecast: ")
 print(result_list["max"])
 
 plt.plot([x for x in range(stock.days2predict + 1)], result_list["min"])
+plt.grid(True)
 plt.title("Minimum Forecast")
 plt.show()
 plt.plot([x for x in range(stock.days2predict + 1)], result_list["max"])
+plt.grid(True)
 plt.title("Maximum Forecast")
 plt.show()
-plt.hist(result_list["hist_mid"], bins='auto')
+plt.hist(result_list["hist_mid"], bins='auto', align='mid')
+plt.grid(True)
 plt.title("Mid period histogram")
 plt.show()
-plt.hist(result_list["hist_end"], bins='auto')
+plt.hist(result_list["hist_end"], bins='auto', align='mid')
+plt.grid(True)
 plt.title("End period histogram")
 plt.show()
