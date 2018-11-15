@@ -1,6 +1,6 @@
 import pywren_ibm_cloud as pywren
 from time import time
-from numpy import median, exp, random
+from numpy import exp, random
 import matplotlib.pyplot as plt
 from scipy.stats import norm
 
@@ -12,17 +12,18 @@ class StockData:
         self.last_value = last_value
         self.std_dev = std_dev
         self.drift = drift
+        self.forcast_length = days2predict + 1
 
     def prediction(self):
         predicts_est = [self.last_value]
-        for predict in range(1, self.days2predict + 1):
+        for predict in range(1, self.forcast_length):
             rand = random.rand()
             pow_r = norm.ppf(rand)
             predicts_est.append(predicts_est[predict - 1] * exp(self.drift + (self.std_dev * pow_r)))
         return predicts_est
 
 
-ACTIONS = 1000
+ACTIONS = 1500
 TOTAL = ACTIONS
 print("Total Prediction: " + str(TOTAL))
 
@@ -42,7 +43,19 @@ def my_map_function():
 
 
 def my_reduce_function(list_of_lists):
-    return [median(x) for x in zip(*list_of_lists)]
+    end = stock.days2predict
+    hist_end = [frc[end] for frc in list_of_lists]
+    mid = int(stock.days2predict / 2)
+    hist_mid = [frc[mid] for frc in list_of_lists]
+    min_forecast = []
+    max_forecast = []
+    for frc in list_of_lists:
+        if len(min_forecast) == 0 or (frc[stock.days2predict] < min_forecast[stock.days2predict]):
+            min_forecast = frc
+
+        if len(max_forecast) == 0 or (frc[stock.days2predict] > max_forecast[stock.days2predict]):
+            max_forecast = frc
+    return {"min": min_forecast, "max": max_forecast, "hist_mid": hist_mid, "hist_end": hist_end}
 
 
 """
@@ -50,8 +63,8 @@ Set 'reducer_wait_local=False' to launch the reducer and wait for
 the results remotely.
 """
 
-FLAG = "LOCAL"
-# FLAG = "CLOUD"
+# FLAG = "LOCAL"
+FLAG = "CLOUD"
 if FLAG == "LOCAL":
     start_time = time()
     for i in range(ACTIONS):
@@ -64,10 +77,23 @@ else:
     result_list = pw.get_result()
 
 elapsed = time()
-
-print("Stock values prediction: ")
-print(result_list)
-
 print("\nDuration: " + str(elapsed - start_time) + " Sec")
-plt.plot([x for x in range(stock.days2predict + 1)], result_list)
+
+print("Stock values minimum forecast: ")
+print(result_list["min"])
+
+print("Stock values maximum forecast: ")
+print(result_list["max"])
+
+plt.plot([x for x in range(stock.days2predict + 1)], result_list["min"])
+plt.title("Minimum Forecast")
+plt.show()
+plt.plot([x for x in range(stock.days2predict + 1)], result_list["max"])
+plt.title("Maximum Forecast")
+plt.show()
+plt.hist(result_list["hist_mid"], bins='auto')
+plt.title("Mid period histogram")
+plt.show()
+plt.hist(result_list["hist_end"], bins='auto')
+plt.title("End period histogram")
 plt.show()
