@@ -7,7 +7,7 @@ exe_location = Location.CLOUD
 
 
 class StockData:
-    total_forecasts = 1500
+    total_forecasts = 1200
     days2predict = 1095
 
     def __init__(self, name, drift, std_dev, last_value, ticks):
@@ -43,7 +43,7 @@ def my_map_function(curr=None):
     return current_stock.forecast()
 
 
-def my_reduce_function(list_of_lists):
+def my_reduce_function(list_of_lists, futures):
     end = current_stock.days2predict
     hist_end = [frc[end] for frc in list_of_lists]
     mid = int(current_stock.days2predict / 2)
@@ -56,7 +56,8 @@ def my_reduce_function(list_of_lists):
 
         if len(max_forecast) == 0 or (frc[end] > max_forecast[end]):  # setting best case by maximum last day
             max_forecast = frc
-    return {"min": min_forecast, "max": max_forecast, "hist_mid": hist_mid, "hist_end": hist_end}
+    return {"futures": futures,
+            "result_obj": {"min": min_forecast, "max": max_forecast, "hist_mid": hist_mid, "hist_end": hist_end}}
 
 
 executer = ExecuterWrap()

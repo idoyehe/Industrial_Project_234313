@@ -26,13 +26,15 @@ class ExecuterWrap(object):
         else:
             start_time = time()
             pw = pywren.ibm_cf_executor()
-            future = pw.map_reduce(my_map_function, iterdata, my_reduce_function, reducer_wait_local=False)
+            pw.map_reduce(my_map_function, iterdata, my_reduce_function, reducer_wait_local=False)
             result_object = pw.get_result()
-            run_statuses = future.run_status
-            invoke_statuses = future.invoke_status
+            futures = result_object["futures"]
+            run_statuses = [f.run_status for f in futures]
+            invoke_statuses = [f.invoke_status for f in futures]
             res = {'run_statuses': run_statuses, 'invoke_statuses': invoke_statuses}
-            dump(res, open('statuses.pickle', 'wb'), -1)
+            dump(res, open('./statuses.pickle', 'wb'), -1)
+            pw.clean()
 
         elapsed = time()
         print("\nDuration: " + str(elapsed - start_time) + " Sec")
-        return result_object
+        return result_object["result_obj"]
