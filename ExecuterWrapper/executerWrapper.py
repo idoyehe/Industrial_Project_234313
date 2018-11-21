@@ -23,11 +23,14 @@ class ExecuterWrap(object):
             for i in range(action_number):
                 iterdata[i] = my_map_function(iterdata[i])
             result_object = my_reduce_function(iterdata)
+            elapsed = time()
         else:
+
             start_time = time()
             pw = pywren.ibm_cf_executor()
             pw.map_reduce(my_map_function, iterdata, my_reduce_function, reducer_wait_local=False)
             result_object = pw.get_result()
+            elapsed = time()
             futures = result_object["futures"]
             run_statuses = [f.run_status for f in futures]
             invoke_statuses = [f.invoke_status for f in futures]
@@ -35,6 +38,5 @@ class ExecuterWrap(object):
             dump(res, open('./statuses.pickle', 'wb'), -1)
             pw.clean()
 
-        elapsed = time()
         print("\nDuration: " + str(elapsed - start_time) + " Sec")
         return result_object["result_obj"]
