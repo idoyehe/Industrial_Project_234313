@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import norm
 from ExecuterWrapper.executerWrapper import ExecuterWrap, Location
 
-exe_location = Location.LOCAL
+exe_location = Location.CLOUD
 
 
 class StockData:
@@ -47,7 +47,7 @@ mlnx = StockData(name="Mellanox", drift=0.000581742829, std_dev=0.029879238, las
 ibm = StockData(name="IBM", drift=0.000091967236, std_dev=0.012404562, last_value=153.42, ticks=50)
 nvda = StockData(name="Nvdia", drift=0.000936809, std_dev=0.027145343, last_value=193.5, ticks=50)
 
-ACTIONS = 500
+ACTIONS = 1000
 
 current_stock = gold
 print("Current Stock: " + current_stock.name)
@@ -119,7 +119,6 @@ plt.grid(True)
 plt.title("Mid prediction period histogram")
 plt.ylabel("Count")
 plt.xlabel("Value [$]")
-plt.xticks(arange(min(mid_data), max(mid_data), current_stock.ticks))
 plt.show()
 
 '''Histogram for end prediction forecast plot'''
@@ -129,5 +128,4 @@ plt.grid(True)
 plt.title("End prediction period histogram")
 plt.ylabel("Count")
 plt.xlabel("Value [$]")
-plt.xticks(arange(min(end_data), max(end_data), current_stock.ticks))
 plt.show()
