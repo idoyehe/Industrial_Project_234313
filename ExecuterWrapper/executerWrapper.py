@@ -2,6 +2,7 @@ from enum import Enum
 from time import time
 import pywren_ibm_cloud as pywren
 from pickle import dump
+import logging
 
 
 class Location(Enum):
@@ -25,7 +26,7 @@ class ExecuterWrap(object):
             result_object = my_reduce_function(iterdata)
             elapsed = time()
         else:
-
+            # logging.basicConfig(level=logging.DEBUG)
             start_time = time()
             pw = pywren.ibm_cf_executor()
             pw.map_reduce(my_map_function, iterdata, my_reduce_function, reducer_wait_local=False)

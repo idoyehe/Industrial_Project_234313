@@ -49,6 +49,7 @@ nvda = StockData(name="Nvdia", drift=0.000936809, std_dev=0.027145343, last_valu
 
 ACTIONS = 1000
 
+
 current_stock = gold
 print("Current Stock: " + current_stock.name)
 print("Total Forecasts: " + str(ACTIONS * StockData.total_forecasts))
@@ -65,13 +66,13 @@ def my_map_function(curr=None):
     return StockData.forecast_analyzer(forecasts)
 
 
-def my_reduce_function(list_of_analysis):
+def my_reduce_function(results):
     end = StockData.days2predict
     hist_end = []
     hist_mid = []
     min_forecast = []
     max_forecast = []
-    for frc in list_of_analysis:
+    for frc in results:
         hist_end.extend(frc['hist_end'])
         hist_mid.extend(frc['hist_mid'])
         if len(min_forecast) == 0 or (frc['min'][end] < min_forecast[end]):  # setting worst case by minimum last day

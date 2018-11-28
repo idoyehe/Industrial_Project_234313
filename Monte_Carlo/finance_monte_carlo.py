@@ -43,20 +43,20 @@ def my_map_function(curr=None):
     return current_stock.forecast()
 
 
-def my_reduce_function(list_of_lists, futures):
+def my_reduce_function(results):
     end = current_stock.days2predict
-    hist_end = [frc[end] for frc in list_of_lists]
+    hist_end = [frc[end] for frc in results]
     mid = int(current_stock.days2predict / 2)
-    hist_mid = [frc[mid] for frc in list_of_lists]
+    hist_mid = [frc[mid] for frc in results]
     min_forecast = []
     max_forecast = []
-    for frc in list_of_lists:
+    for frc in results:
         if len(min_forecast) == 0 or (frc[end] < min_forecast[end]):  # setting worst case by minimum last day
             min_forecast = frc
 
         if len(max_forecast) == 0 or (frc[end] > max_forecast[end]):  # setting best case by maximum last day
             max_forecast = frc
-    return {"futures": futures,
+    return {"futures": "",
             "result_obj": {"min": min_forecast, "max": max_forecast, "hist_mid": hist_mid, "hist_end": hist_end}}
 
 
