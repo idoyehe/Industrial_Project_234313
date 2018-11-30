@@ -47,6 +47,9 @@ class StockData:
 ibm_10 = StockData(title="IBM Based last 10 years", drift=0.0000579602177315899, std_dev=0.0119319087951656, last_value=116.49)
 ibm_3 = StockData(title="IBM Based last 3 years", drift=-0.000418352004242025, std_dev=0.0120446535109423, last_value=116.49)
 
+intel_10 = StockData(title="Intel Based last 10 years", drift=0.000359910620036371, std_dev=0.0155512505615464, last_value=48.29)
+intel_3 = StockData(title="Intel Based last 3 years", drift=0.000169007164760754, std_dev=0.0152474310285415, last_value=48.29)
+
 current_stock = ibm_3
 
 print("Current Stock: " + current_stock.title)
