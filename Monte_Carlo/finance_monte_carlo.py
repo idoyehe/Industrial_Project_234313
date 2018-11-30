@@ -1,23 +1,23 @@
 from numpy import exp, random, arange
 import matplotlib.pyplot as plt
 from scipy.stats import norm
-from ExecuterWrapper.executerWrapper import ExecuterWrap, Location
+from ExecuterWrapper.executorWrapper import ExecutorWrap, Location
 
-exe_location = Location.CLOUD
+exe_location = Location.LOCAL
+MAP_INSTANCES = 1000
 
 
 class StockData:
-    total_forecasts = 1200
-    days2predict = 1095
+    forecasts_per_map = 1
+    days2predict = 365
 
-    def __init__(self, name, drift, std_dev, last_value, ticks):
-        self.ticks = ticks
-        self.name = name
+    def __init__(self, title, drift, std_dev, last_value):
+        self.title = title
         self.last_value = last_value
         self.std_dev = std_dev
         self.drift = drift
 
-    def forecast(self):
+    def single_forecast_generator(self):
         predicts_est = [self.last_value]
         for predict in range(1, self.days2predict + 1):
             rand = random.rand()
@@ -25,53 +25,72 @@ class StockData:
             predicts_est.append(predicts_est[predict - 1] * exp(self.drift + (self.std_dev * pow_r)))
         return predicts_est
 
+    @staticmethod
+    def multi_forecasts_analyzer(list_of_forecasts):
+        end = current_stock.days2predict
+        mid = int(end / 2)
+        hist_end = list()
+        hist_mid = list()
+        min_f = None
+        max_f = None
+        for frc in list_of_forecasts:
+            hist_end.append(frc[end])
+            hist_mid.append(frc[mid])
+            if min_f is None or (frc[end] < min_f[end]):  # setting worst case by minimum last day
+                min_f = frc
 
-gold = StockData(name="GOLD", drift=0.000142559, std_dev=0.010561899, last_value=1296.5, ticks=400)
-mlnx = StockData(name="Mellanox", drift=0.000581742829, std_dev=0.029879238, last_value=64.7, ticks=10)
-ibm = StockData(name="IBM", drift=0.000091967236, std_dev=0.012404562, last_value=153.42, ticks=50)
-nvda = StockData(name="Nvdia", drift=0.000936809, std_dev=0.027145343, last_value=193.5, ticks=50)
+            if max_f is None or (frc[end] > max_f[end]):  # setting best case by maximum last day
+                max_f = frc
+        return min_f, max_f, hist_mid, hist_end
 
-current_stock = gold
-print("Current Stock: " + current_stock.name)
-print("Total Forecasts: " + str(StockData.total_forecasts))
+
+ibm_10 = StockData(title="IBM Based last 10 years", drift=0.0000579602177315899, std_dev=0.0119319087951656, last_value=116.49)
+ibm_3 = StockData(title="IBM Based last 3 years", drift=-0.000418352004242025, std_dev=0.0120446535109423, last_value=116.49)
+
+current_stock = ibm_3
+
+print("Current Stock: " + current_stock.title)
+print("Total Forecasts: " + str(MAP_INSTANCES * StockData.forecasts_per_map))
 print("Days to Predict: " + str(current_stock.days2predict))
 
-iterdata = [[]] * StockData.total_forecasts
+iterdata = [()] * MAP_INSTANCES
 
 
-def my_map_function(curr=None):
-    return current_stock.forecast()
+def map_function(data=None):
+    forecasts = []
+    for i in range(StockData.forecasts_per_map):
+        forecasts.append(current_stock.single_forecast_generator())
+    return StockData.multi_forecasts_analyzer(forecasts)
 
 
-def my_reduce_function(results):
+def reduce_function(results):
     end = current_stock.days2predict
-    hist_end = [frc[end] for frc in results]
-    mid = int(current_stock.days2predict / 2)
-    hist_mid = [frc[mid] for frc in results]
-    min_forecast = []
-    max_forecast = []
-    for frc in results:
-        if len(min_forecast) == 0 or (frc[end] < min_forecast[end]):  # setting worst case by minimum last day
-            min_forecast = frc
+    hist_end = list()
+    hist_mid = list()
+    min_f = None
+    max_f = None
+    for single_map_result in results:
+        hist_end.extend(single_map_result[3])
+        hist_mid.extend(single_map_result[2])
+        if min_f is None or (single_map_result[0][end] < min_f[end]):  # setting worst case by minimum last day
+            min_f = single_map_result[0]
+        if max_f is None or (single_map_result[1][end] > max_f[end]):  # setting best case by maximum last day
+            max_f = single_map_result[1]
+    return {"futures": None, "results": (min_f, max_f, hist_mid, hist_end)}
 
-        if len(max_forecast) == 0 or (frc[end] > max_forecast[end]):  # setting best case by maximum last day
-            max_forecast = frc
-    return {"futures": "",
-            "result_obj": {"min": min_forecast, "max": max_forecast, "hist_mid": hist_mid, "hist_end": hist_end}}
 
-
-executer = ExecuterWrap()
-executer.set_location(exe_location)
-result_obj = executer.map_reduce_execution(my_map_function, iterdata, my_reduce_function)
+executor = ExecutorWrap(MAP_INSTANCES)
+executor.set_location(exe_location)
+result_obj = executor.map_reduce_execution(map_function, iterdata, reduce_function)
 
 print("Stock values minimum forecast: ")
-print(result_obj["min"])
+print(result_obj[0])
 
 print("Stock values maximum forecast: ")
-print(result_obj["max"])
+print(result_obj[1])
 
 '''Minimum forecast plot'''
-min_forecast = result_obj["min"]
+min_forecast = result_obj[0]
 plt.plot([x for x in range(current_stock.days2predict + 1)], min_forecast)
 plt.grid(True)
 plt.xlabel("Days")
@@ -81,7 +100,7 @@ plt.xticks(arange(0, StockData.days2predict + 1, 150))
 plt.show()
 
 '''Maximum forecast plot'''
-max_forecast = result_obj["max"]
+max_forecast = result_obj[1]
 plt.plot([x for x in range(current_stock.days2predict + 1)], max_forecast)
 plt.grid(True)
 plt.title("Maximum Forecast")
@@ -91,21 +110,19 @@ plt.xticks(arange(0, StockData.days2predict + 1, 150))
 plt.show()
 
 '''Histogram for mid prediction forecast plot'''
-mid_data = result_obj["hist_mid"]
+mid_data = result_obj[2]
 plt.hist(mid_data, bins='auto')
 plt.grid(True)
 plt.title("Mid prediction period histogram")
 plt.ylabel("Count")
 plt.xlabel("Value [$]")
-plt.xticks(arange(min(mid_data), max(mid_data), current_stock.ticks))
 plt.show()
 
 '''Histogram for end prediction forecast plot'''
-end_data = result_obj["hist_end"]
+end_data = result_obj[3]
 plt.hist(end_data, bins='auto')
 plt.grid(True)
 plt.title("End prediction period histogram")
 plt.ylabel("Count")
 plt.xlabel("Value [$]")
-plt.xticks(arange(min(end_data), max(end_data), current_stock.ticks))
 plt.show()

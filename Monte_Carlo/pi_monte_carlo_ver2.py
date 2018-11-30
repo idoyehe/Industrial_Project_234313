@@ -1,5 +1,7 @@
 from random import random
-from ExecuterWrapper.executerWrapper import ExecuterWrap, Location
+from ExecuterWrapper.executorWrapper import ExecutorWrap, Location
+
+exe_location = Location.LOCAL
 
 ACTIONS = 50
 PER_ACTION = 1000000
@@ -23,11 +25,11 @@ def my_reduce_function(results):
     for map_result in results:
         for p in map_result:
             sumPI += p
-    return float(4 * (sumPI / TOTAL))
+    return {"futures": None, "results": float(4 * (sumPI / TOTAL))}
 
 
-executer = ExecuterWrap()
-executer.set_location(Location.LOCAL)
-result_obj = executer.map_reduce_execution(my_map_function, iterdata, my_reduce_function)
+executor = ExecutorWrap(ACTIONS)
+executor.set_location(exe_location)
+result_obj = executor.map_reduce_execution(my_map_function, iterdata, my_reduce_function)
 print("Amortized PI is: ")
 print(result_obj)
