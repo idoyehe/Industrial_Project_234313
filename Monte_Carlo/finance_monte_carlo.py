@@ -4,11 +4,11 @@ import scipy.stats as scpy
 from ExecuterWrapper.executorWrapper import ExecutorWrap, Location
 
 exe_location = Location.PYWREN
-MAP_INSTANCES = 100
+MAP_INSTANCES = 1000
 
 
 class StockData:
-    forecasts_per_map = 1000
+    forecasts_per_map = 100
     days2predict = 1095
 
     def __init__(self, title, drift, std_dev, last_value):
@@ -68,7 +68,7 @@ def map_function(data=None):
     return StockData.multi_forecasts_analyzer(forecasts)
 
 
-def reduce_function(results, futures):
+def reduce_function(results):
     end = current_stock.days2predict
     hist_end = list()
     hist_mid = list()
@@ -81,7 +81,7 @@ def reduce_function(results, futures):
             min_f = single_map_result[0]
         if max_f is None or (single_map_result[1][end] > max_f[end]):  # setting best case by maximum last day
             max_f = single_map_result[1]
-    return {"futures": futures, "results": (min_f, max_f, hist_mid, hist_end)}
+    return {"futures": None, "results": (min_f, max_f, hist_mid, hist_end)}
 
 
 executor = ExecutorWrap(MAP_INSTANCES)
