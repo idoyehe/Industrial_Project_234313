@@ -1,9 +1,9 @@
-from numpy import exp, random, arange
+import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
 from ExecuterWrapper.executorWrapper import ExecutorWrap, Location
 
-exe_location = Location.LOCAL
+exe_location = Location.PYWREN
 MAP_INSTANCES = 1000
 
 
@@ -20,9 +20,9 @@ class StockData:
     def single_forecast_generator(self):
         predicts_est = [self.last_value]
         for predict in range(1, self.days2predict + 1):
-            rand = random.rand()
+            rand = np.random.rand()
             pow_r = norm.ppf(rand)
-            predicts_est.append(predicts_est[predict - 1] * exp(self.drift + (self.std_dev * pow_r)))
+            predicts_est.append(predicts_est[predict - 1] * np.exp(self.drift + (self.std_dev * pow_r)))
         return predicts_est
 
     @staticmethod
@@ -66,7 +66,7 @@ def map_function(data=None):
     return StockData.multi_forecasts_analyzer(forecasts)
 
 
-def reduce_function(results):
+def reduce_function(results, futures):
     end = current_stock.days2predict
     hist_end = list()
     hist_mid = list()
@@ -79,7 +79,7 @@ def reduce_function(results):
             min_f = single_map_result[0]
         if max_f is None or (single_map_result[1][end] > max_f[end]):  # setting best case by maximum last day
             max_f = single_map_result[1]
-    return {"futures": None, "results": (min_f, max_f, hist_mid, hist_end)}
+    return {"futures": futures, "results": (min_f, max_f, hist_mid, hist_end)}
 
 
 executor = ExecutorWrap(MAP_INSTANCES)
@@ -99,7 +99,7 @@ plt.grid(True)
 plt.xlabel("Days")
 plt.ylabel("Value [$]")
 plt.title("Minimum Forecast")
-plt.xticks(arange(0, StockData.days2predict + 1, 150))
+plt.xticks(np.arange(0, StockData.days2predict + 1, 150))
 plt.show()
 
 '''Maximum forecast plot'''
@@ -109,7 +109,7 @@ plt.grid(True)
 plt.title("Maximum Forecast")
 plt.xlabel("Days")
 plt.ylabel("Value [$]")
-plt.xticks(arange(0, StockData.days2predict + 1, 150))
+plt.xticks(np.arange(0, StockData.days2predict + 1, 150))
 plt.show()
 
 '''Histogram for mid prediction forecast plot'''
