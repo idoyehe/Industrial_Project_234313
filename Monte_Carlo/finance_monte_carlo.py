@@ -1,14 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.stats import norm
+import scipy.stats as scpy
 from ExecuterWrapper.executorWrapper import ExecutorWrap, Location
 
 exe_location = Location.PYWREN
-MAP_INSTANCES = 1000
+MAP_INSTANCES = 100
 
 
 class StockData:
-    forecasts_per_map = 100
+    forecasts_per_map = 1000
     days2predict = 1095
 
     def __init__(self, title, drift, std_dev, last_value):
@@ -21,7 +21,7 @@ class StockData:
         predicts_est = [self.last_value]
         for predict in range(1, self.days2predict + 1):
             rand = np.random.rand()
-            pow_r = norm.ppf(rand)
+            pow_r = scpy.norm.ppf(rand)
             predicts_est.append(predicts_est[predict - 1] * np.exp(self.drift + (self.std_dev * pow_r)))
         return predicts_est
 
@@ -88,46 +88,46 @@ executor = ExecutorWrap(MAP_INSTANCES)
 executor.set_location(exe_location)
 result_obj = executor.map_reduce_execution(map_function, iterdata, reduce_function)
 
-print("Stock values minimum forecast: ")
-print(result_obj[0])
-
-print("Stock values maximum forecast: ")
-print(result_obj[1])
-
-'''Minimum forecast plot'''
-min_forecast = result_obj[0]
-plt.plot([x for x in range(current_stock.days2predict + 1)], min_forecast)
-plt.grid(True)
-plt.xlabel("Days")
-plt.ylabel("Value [$]")
-plt.title("Minimum Forecast")
-plt.xticks(np.arange(0, StockData.days2predict + 1, 150))
-plt.show()
-
-'''Maximum forecast plot'''
-max_forecast = result_obj[1]
-plt.plot([x for x in range(current_stock.days2predict + 1)], max_forecast)
-plt.grid(True)
-plt.title("Maximum Forecast")
-plt.xlabel("Days")
-plt.ylabel("Value [$]")
-plt.xticks(np.arange(0, StockData.days2predict + 1, 150))
-plt.show()
-
-'''Histogram for mid prediction forecast plot'''
-mid_data = result_obj[2]
-plt.hist(mid_data, bins='auto')
-plt.grid(True)
-plt.title("Mid prediction period histogram")
-plt.ylabel("Count")
-plt.xlabel("Value [$]")
-plt.show()
-
-'''Histogram for end prediction forecast plot'''
-end_data = result_obj[3]
-plt.hist(end_data, bins='auto')
-plt.grid(True)
-plt.title("End prediction period histogram")
-plt.ylabel("Count")
-plt.xlabel("Value [$]")
-plt.show()
+# print("Stock values minimum forecast: ")
+# print(result_obj[0])
+#
+# print("Stock values maximum forecast: ")
+# print(result_obj[1])
+#
+# '''Minimum forecast plot'''
+# min_forecast = result_obj[0]
+# plt.plot([x for x in range(current_stock.days2predict + 1)], min_forecast)
+# plt.grid(True)
+# plt.xlabel("Days")
+# plt.ylabel("Value [$]")
+# plt.title("Minimum Forecast")
+# plt.xticks(np.arange(0, StockData.days2predict + 1, 150))
+# plt.show()
+#
+# '''Maximum forecast plot'''
+# max_forecast = result_obj[1]
+# plt.plot([x for x in range(current_stock.days2predict + 1)], max_forecast)
+# plt.grid(True)
+# plt.title("Maximum Forecast")
+# plt.xlabel("Days")
+# plt.ylabel("Value [$]")
+# plt.xticks(np.arange(0, StockData.days2predict + 1, 150))
+# plt.show()
+#
+# '''Histogram for mid prediction forecast plot'''
+# mid_data = result_obj[2]
+# plt.hist(mid_data, bins='auto')
+# plt.grid(True)
+# plt.title("Mid prediction period histogram")
+# plt.ylabel("Count")
+# plt.xlabel("Value [$]")
+# plt.show()
+#
+# '''Histogram for end prediction forecast plot'''
+# end_data = result_obj[3]
+# plt.hist(end_data, bins='auto')
+# plt.grid(True)
+# plt.title("End prediction period histogram")
+# plt.ylabel("Count")
+# plt.xlabel("Value [$]")
+# plt.show()

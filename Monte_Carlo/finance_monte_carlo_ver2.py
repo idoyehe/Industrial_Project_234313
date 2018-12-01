@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.stats import norm
+import scipy.stats as scpy
 from ExecuterWrapper.executorWrapper import ExecutorWrap, Location
 
 exe_location = Location.PYWREN
@@ -21,7 +21,7 @@ class StockData:
         predicts_est = [self.last_value]
         for predict in range(1, self.days2predict + 1):
             rand = np.random.rand()
-            pow_r = norm.ppf(rand)
+            pow_r = scpy.norm.ppf(rand)
             predicts_est.append(predicts_est[predict - 1] * np.exp(self.drift + (self.std_dev * pow_r)))
         return predicts_est
 
