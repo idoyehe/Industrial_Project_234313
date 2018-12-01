@@ -46,9 +46,11 @@ class StockData:
 
 ibm_10 = StockData(title="IBM Based last 10 years", drift=0.0000579602177315899, std_dev=0.0119319087951656, last_value=116.49)
 ibm_3 = StockData(title="IBM Based last 3 years", drift=-0.000418352004242025, std_dev=0.0120446535109423, last_value=116.49)
+ibm_2014_2015_2016 = StockData(title="IBM 2014, 2015, 2016", drift=-0.00022513546014255100, std_dev=0.0121678341323272, last_value=166.44)
 
 intel_10 = StockData(title="Intel Based last 10 years", drift=0.000359910620036371, std_dev=0.0155512505615464, last_value=48.29)
 intel_3 = StockData(title="Intel Based last 3 years", drift=0.000169007164760754, std_dev=0.0152474310285415, last_value=48.29)
+intel_2014_2015_2016 = StockData(title="Intel 2014, 2015, 2016", drift=0.00036084284127726200, std_dev=0.0143579745383959, last_value=36.79)
 
 current_stock = ibm_10
 
