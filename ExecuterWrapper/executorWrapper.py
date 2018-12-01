@@ -27,7 +27,7 @@ class ExecutorWrap(object):
         return result_object['results'], elapsed - start_time
 
     def _pywren_execution(self, map_function, iterable_data, reduce_function):
-        logging.basicConfig(level=logging.DEBUG)
+        # logging.basicConfig(level=logging.DEBUG)
         start_time = time()
         pw = pywren.ibm_cf_executor()
         pw.map_reduce(map_function, iterable_data, reduce_function, reducer_wait_local=False)
