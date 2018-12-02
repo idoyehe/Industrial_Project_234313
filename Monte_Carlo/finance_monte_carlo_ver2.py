@@ -9,7 +9,7 @@ MAP_INSTANCES = 1000
 
 class StockData:
     forecasts_per_map = 100
-    days2predict = 1095
+    days2predict = 365
 
     def __init__(self, title, drift, std_dev, last_value):
         self.title = title
@@ -45,7 +45,7 @@ intel_10 = StockData(title="Intel Based last 10 years", drift=0.0003599106200363
 intel_3 = StockData(title="Intel Based last 3 years", drift=0.000169007164760754, std_dev=0.0152474310285415, last_value=48.29)
 intel_2014_2015_2016 = StockData(title="Intel 2014, 2015, 2016", drift=0.00036084284127726200, std_dev=0.0143579745383959, last_value=36.79)
 
-current_stock = ibm_10
+current_stock = intel_3
 
 print("Current Stock: " + current_stock.title)
 print("Total Forecasts: " + str(MAP_INSTANCES * StockData.forecasts_per_map))
@@ -77,6 +77,8 @@ result_obj = executor.map_reduce_execution(map_function, iterdata, reduce_functi
 
 '''Histogram for mid prediction forecast plot'''
 mid_data = result_obj[0]
+print("MID Histogram:")
+print(mid_data)
 plt.hist(mid_data, bins='auto')
 plt.grid(True)
 plt.title("Mid prediction period histogram")
@@ -86,6 +88,8 @@ plt.show()
 
 '''Histogram for end prediction forecast plot'''
 end_data = result_obj[1]
+print("END Histogram:")
+print(end_data)
 plt.hist(end_data, bins='auto')
 plt.grid(True)
 plt.title("End prediction period histogram")
