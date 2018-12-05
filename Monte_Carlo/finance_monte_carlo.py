@@ -25,32 +25,16 @@ class StockData:
             predicts_est.append(predicts_est[predict - 1] * np.exp(self.drift + (self.std_dev * pow_r)))
         return predicts_est
 
-    @staticmethod
-    def multi_forecasts_analyzer(list_of_forecasts):
-        end = current_stock.days2predict
-        mid = int(end / 2)
-        hist_end = list()
-        hist_mid = list()
-        min_f = None
-        max_f = None
-        for frc in list_of_forecasts:
-            hist_end.append(frc[end])
-            hist_mid.append(frc[mid])
-            if min_f is None or (frc[end] < min_f[end]):  # setting worst case by minimum last day
-                min_f = frc
-
-            if max_f is None or (frc[end] > max_f[end]):  # setting best case by maximum last day
-                max_f = frc
-        return min_f, max_f, hist_mid, hist_end
-
 
 ibm_10 = StockData(title="IBM Based last 10 years", drift=0.0000579602177315899, std_dev=0.0119319087951656, last_value=116.49)
 ibm_3 = StockData(title="IBM Based last 3 years", drift=-0.000418352004242025, std_dev=0.0120446535109423, last_value=116.49)
-ibm_2014_2015_2016 = StockData(title="IBM 2014, 2015, 2016", drift=-0.00022513546014255100, std_dev=0.0121678341323272, last_value=166.44)
+ibm_2014_2015_2016 = StockData(title="IBM 2014, 2015, 2016", drift=-0.00022513546014255100, std_dev=0.0121678341323272,
+                               last_value=166.44)
 
 intel_10 = StockData(title="Intel Based last 10 years", drift=0.000359910620036371, std_dev=0.0155512505615464, last_value=48.29)
 intel_3 = StockData(title="Intel Based last 3 years", drift=0.000169007164760754, std_dev=0.0152474310285415, last_value=48.29)
-intel_2014_2015_2016 = StockData(title="Intel 2014, 2015, 2016", drift=0.00036084284127726200, std_dev=0.0143579745383959, last_value=36.79)
+intel_2014_2015_2016 = StockData(title="Intel 2014, 2015, 2016", drift=0.00036084284127726200, std_dev=0.0143579745383959,
+                                 last_value=36.79)
 
 current_stock = ibm_10
 
@@ -58,18 +42,29 @@ print("Current Stock: " + current_stock.title)
 print("Total Forecasts: " + str(MAP_INSTANCES * StockData.forecasts_per_map))
 print("Days to Predict: " + str(current_stock.days2predict))
 
-iterdata = [()] * MAP_INSTANCES
+iterate_data = [()] * MAP_INSTANCES
 
 
 def map_function(data=None):
-    forecasts = []
-    for i in range(StockData.forecasts_per_map):
-        forecasts.append(current_stock.single_forecast_generator())
-    return StockData.multi_forecasts_analyzer(forecasts)
+    end = current_stock.days2predict
+    mid = int(end / 2)
+    hist_end = list()
+    hist_mid = list()
+    min_f = None
+    max_f = None
+    for i in range(current_stock.forecasts_per_map):
+        frc = current_stock.single_forecast_generator()
+        hist_end.append(frc[end])
+        hist_mid.append(frc[mid])
+        if min_f is None or (frc[end] < min_f[end]):  # setting worst case by minimum last day
+            min_f = frc
+        if max_f is None or (frc[end] > max_f[end]):  # setting best case by maximum last day
+            max_f = frc
+    return min_f, max_f, hist_mid, hist_end
 
 
 def reduce_function(results):
-    print(np.__version__)
+    print(np.__version__)# in order to import numpy
     end = current_stock.days2predict
     hist_end = list()
     hist_mid = list()
@@ -87,7 +82,7 @@ def reduce_function(results):
 
 executor = ExecutorWrap(MAP_INSTANCES)
 executor.set_location(exe_location)
-result_obj = executor.map_reduce_execution(map_function, iterdata, reduce_function)
+result_obj = executor.map_reduce_execution(map_function, iterate_data, reduce_function)
 
 # print("Stock values minimum forecast: ")
 # print(result_obj[0])

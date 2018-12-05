@@ -25,18 +25,6 @@ class StockData:
             predicts_est.append(predicts_est[predict - 1] * np.exp(self.drift + (self.std_dev * pow_r)))
         return predicts_est
 
-    @staticmethod
-    def multi_forecasts_analyzer(list_of_forecasts):
-        print(np.__version__)
-        end = current_stock.days2predict
-        mid = int(end / 2)
-        hist_end = list()
-        hist_mid = list()
-        for frc in list_of_forecasts:
-            hist_end.append(frc[end])
-            hist_mid.append(frc[mid])
-        return hist_mid, hist_end
-
 
 ibm_10 = StockData(title="IBM Based last 10 years", drift=0.0000579602177315899, std_dev=0.0119319087951656, last_value=116.49)
 ibm_3 = StockData(title="IBM Based last 3 years", drift=-0.000418352004242025, std_dev=0.0120446535109423, last_value=116.49)
@@ -56,13 +44,19 @@ iterdata = [()] * MAP_INSTANCES
 
 
 def map_function(data=None):
-    forecasts = []
+    end = current_stock.days2predict
+    mid = int(end / 2)
+    hist_end = list()
+    hist_mid = list()
     for i in range(StockData.forecasts_per_map):
-        forecasts.append(current_stock.single_forecast_generator())
-    return StockData.multi_forecasts_analyzer(forecasts)
+        frc = current_stock.single_forecast_generator()
+        hist_end.append(frc[end])
+        hist_mid.append(frc[mid])
+    return hist_mid, hist_end
 
 
 def reduce_function(results):
+    print(np.__version__)# in order to import numpy
     hist_end = list()
     hist_mid = list()
     for single_map_result in results:
@@ -71,7 +65,6 @@ def reduce_function(results):
     return {"futures": None, "results": (hist_mid, hist_end)}
 
 
-# for i in range(5):
 executor = ExecutorWrap(MAP_INSTANCES)
 executor.set_location(exe_location)
 result_obj = executor.map_reduce_execution(map_function, iterdata, reduce_function)
