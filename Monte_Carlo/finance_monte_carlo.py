@@ -69,6 +69,7 @@ def map_function(data=None):
 
 
 def reduce_function(results):
+    print(np.__version__)
     end = current_stock.days2predict
     hist_end = list()
     hist_mid = list()

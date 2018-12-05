@@ -27,6 +27,7 @@ class StockData:
 
     @staticmethod
     def multi_forecasts_analyzer(list_of_forecasts):
+        print(np.__version__)
         end = current_stock.days2predict
         mid = int(end / 2)
         hist_end = list()
