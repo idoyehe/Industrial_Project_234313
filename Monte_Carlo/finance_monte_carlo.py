@@ -116,7 +116,7 @@ result_obj = executor.map_reduce_execution(map_function, iterate_data, reduce_fu
 # plt.hist(mid_data, bins='auto')
 # plt.grid(True)
 # plt.title("Mid prediction period histogram")
-# plt.ylabel("Count")
+# plt.ylabel("# Forecasts")
 # plt.xlabel("Value [$]")
 # plt.show()
 #
@@ -125,6 +125,6 @@ result_obj = executor.map_reduce_execution(map_function, iterate_data, reduce_fu
 # plt.hist(end_data, bins='auto')
 # plt.grid(True)
 # plt.title("End prediction period histogram")
-# plt.ylabel("Count")
+# plt.ylabel("# Forecasts")
 # plt.xlabel("Value [$]")
 # plt.show()
