@@ -37,7 +37,7 @@ intel_2016_2017_2018 = StockData(title="Intel Based 2016, 2017, 2018 (end of Oct
 intel_2014_2015_2016 = StockData(title="Intel 2014, 2015, 2016", drift=0.00036084284127726200, std_dev=0.0143579745383959,
                                  last_value=36.79)
 
-current_stock = intel_3
+current_stock = intel_2016_2017_2018
 
 print("Current Stock: " + current_stock.title)
 print("Total Forecasts: " + str(MAP_INSTANCES * StockData.forecasts_per_map))
