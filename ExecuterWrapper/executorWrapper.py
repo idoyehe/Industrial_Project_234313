@@ -40,7 +40,7 @@ class ExecutorWrap(object):
             run_statuses = [f.run_status for f in futures]
             invoke_statuses = [f.invoke_status for f in futures]
             res = {'run_statuses': run_statuses, 'invoke_statuses': invoke_statuses}
-            dump(res, open('./statuses.pickle', 'wb'), -1)
+            dump(res, open('../InvocationsGraphsFiles/statuses.pickle', 'wb'), -1)
         pw.clean()
         return result_object['results'], elapsed - start_time
 
