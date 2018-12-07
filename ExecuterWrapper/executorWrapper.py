@@ -8,6 +8,7 @@ import logging
 class Location(Enum):
     LOCAL = 1
     PYWREN = 2
+    PYWREN_DEBUG = 3
 
 
 class ExecutorWrap(object):
@@ -27,7 +28,8 @@ class ExecutorWrap(object):
         return result_object['results'], elapsed - start_time
 
     def _pywren_execution(self, map_function, iterable_data, reduce_function):
-        # logging.basicConfig(level=logging.DEBUG)
+        if self.execution_location == Location.PYWREN_DEBUG:
+            logging.basicConfig(level=logging.DEBUG)
         start_time = time()
         pw = pywren.ibm_cf_executor(runtime="pywren_3.6")
         pw.map_reduce(map_function, iterable_data, reduce_function, reducer_wait_local=False)
@@ -48,7 +50,7 @@ class ExecutorWrap(object):
         if self.execution_location == Location.LOCAL:
             result_object, duration = self._local_execution(map_function, iterable_data, reduce_function)
         else:
-            assert self.execution_location == Location.PYWREN
+            assert self.execution_location == Location.PYWREN or self.execution_location == Location.PYWREN_DEBUG
             result_object, duration = self._pywren_execution(map_function, iterable_data, reduce_function)
 
         print("\nDuration: " + str(duration) + " Sec")
