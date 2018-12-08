@@ -4,7 +4,7 @@ import fasttext_pywren.amazon_real_reviews_model.label_map as review_labels
 
 train_file_path = "./amazon_real_reviews_model/database/all_reviews.train"
 bin_file_path = "./amazon_real_reviews_model/database/all_reviews.bin"
-test_file_path = "./amazon_real_reviews_model/database/ido.test"
+test_file_path = "./amazon_real_reviews_model/database/all_reviews.test"
 
 # start_time = time()
 # fasttext_model = train_supervised(train_file_path, lr=1.0, wordNgrams=10, loss="hs")
