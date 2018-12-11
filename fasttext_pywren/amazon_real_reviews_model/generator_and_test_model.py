@@ -1,11 +1,10 @@
 from fastText import *
 from time import time
-import fasttext_pywren.amazon_real_reviews_model.label_map as review_labels
 
 train_file_path = "./database/all_reviews.train"
 bin_file_path = "./database/all_reviews.bin"
 test_file_path = "./database/all_reviews.test"
-quan_file_path = "./database/all_reviews_quan.bin"
+quantize_file_path = "./database/all_reviews_quantize.bin"
 
 generate_model = False
 
@@ -29,7 +28,19 @@ duration = elapsed - start_time
 print("\nDuration to LOAD the model: " + str(duration) + " Sec")
 
 start_time = time()
-fasttext_model.save_model(quan_file_path)
+print(fasttext_model.test(test_file_path))
+elapsed = time()
+duration = elapsed - start_time
+print("\nDuration to TEST the model NOT Quantize: " + str(duration) + " Sec")
+
+start_time = time()
+fasttext_model.quantize()
+elapsed = time()
+duration = elapsed - start_time
+print("\nDuration to SAVE the model: " + str(duration) + " Sec")
+
+start_time = time()
+fasttext_model.save_model(quantize_file_path)
 elapsed = time()
 duration = elapsed - start_time
 print("\nDuration to SAVE the model: " + str(duration) + " Sec")
@@ -38,4 +49,4 @@ start_time = time()
 print(fasttext_model.test(test_file_path))
 elapsed = time()
 duration = elapsed - start_time
-print("\nDuration to TEST the model: " + str(duration) + " Sec")
+print("\nDuration to TEST the model Quantize: " + str(duration) + " Sec")

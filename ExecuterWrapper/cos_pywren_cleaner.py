@@ -51,7 +51,7 @@ def delete_file_from_cos(cos, bucket_name, key):
 
 
 def clean_pywren_cos():
-    print('Deleting test files...')
+    print('Deleting Bucket files...')
 
     cos = init_cos_python_object()
     for key in get_filenames_from_cos(cos, CONFIG['pywren']['storage_bucket'], PREFIX):
