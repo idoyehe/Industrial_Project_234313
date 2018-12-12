@@ -1,17 +1,14 @@
 import fastText as fstxt
+import pywren_ibm_cloud as pywren
 
 
-model_path = "./amazon_real_reviews_model/database/all_reviews_quantize.bin"
+model_path = "/fasttext/models/ag_news.ftz"
 
-def my_function():
+def my_function(x):
     fasttext_model = fstxt.load_model(model_path)
-    print(fasttext_model.predict("IDO is Best men"))
-    print(fasttext_model.predict("IDO is Worst men"))
-    print(fasttext_model.predict("IDO"))
-    print(fasttext_model.predict("IDO"))
-    print(fasttext_model.predict("IDO"))
-    print(fasttext_model.predict("IDO"))
-    print(fasttext_model.predict("IDO"))
+    return fasttext_model.predict("IDO is Best men"), fasttext_model.predict("IDO is Worst men")
 
 
-my_function()
+pw = pywren.ibm_cf_executor(runtime="fasttext-ag-news")
+pw.call_async(my_function, 3)
+print(pw.get_result())
