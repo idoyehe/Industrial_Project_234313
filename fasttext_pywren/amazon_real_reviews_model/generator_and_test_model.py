@@ -7,6 +7,8 @@ test_file_path = "./database/all_reviews.test"
 quantize_file_path = "./database/all_reviews_quantize.bin"
 
 generate_model = False
+test_model = False
+quantize_and_test_model = False
 
 if generate_model:
     start_time = time()
@@ -21,32 +23,34 @@ if generate_model:
     duration = elapsed - start_time
     print("\nDuration to SAVE the model: " + str(duration) + " Sec")
 
-start_time = time()
-fasttext_model = load_model(bin_file_path)
-elapsed = time()
-duration = elapsed - start_time
-print("\nDuration to LOAD the model: " + str(duration) + " Sec")
+if test_model:
+    start_time = time()
+    fasttext_model = load_model(bin_file_path)
+    elapsed = time()
+    duration = elapsed - start_time
+    print("\nDuration to LOAD the model: " + str(duration) + " Sec")
 
-start_time = time()
-print(fasttext_model.test(test_file_path))
-elapsed = time()
-duration = elapsed - start_time
-print("\nDuration to TEST the model NOT Quantize: " + str(duration) + " Sec")
+    start_time = time()
+    print(fasttext_model.test(test_file_path))
+    elapsed = time()
+    duration = elapsed - start_time
+    print("\nDuration to TEST the model NOT Quantize: " + str(duration) + " Sec")
 
-start_time = time()
-fasttext_model.quantize()
-elapsed = time()
-duration = elapsed - start_time
-print("\nDuration to SAVE the model: " + str(duration) + " Sec")
+if quantize_and_test_model:
+    start_time = time()
+    fasttext_model.quantize()
+    elapsed = time()
+    duration = elapsed - start_time
+    print("\nDuration to SAVE the model: " + str(duration) + " Sec")
 
-start_time = time()
-fasttext_model.save_model(quantize_file_path)
-elapsed = time()
-duration = elapsed - start_time
-print("\nDuration to SAVE the model: " + str(duration) + " Sec")
+    start_time = time()
+    fasttext_model.save_model(quantize_file_path)
+    elapsed = time()
+    duration = elapsed - start_time
+    print("\nDuration to SAVE the model: " + str(duration) + " Sec")
 
-start_time = time()
-print(fasttext_model.test(test_file_path))
-elapsed = time()
-duration = elapsed - start_time
-print("\nDuration to TEST the model Quantize: " + str(duration) + " Sec")
+    start_time = time()
+    print(fasttext_model.test(test_file_path))
+    elapsed = time()
+    duration = elapsed - start_time
+    print("\nDuration to TEST the model Quantize: " + str(duration) + " Sec")
