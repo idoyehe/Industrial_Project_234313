@@ -40,4 +40,10 @@ RUN git clone https://github.com/facebookresearch/fastText.git /fasttext/package
 RUN pip install /fasttext/package/.
 
 RUN mkdir -p /fasttext/models
-COPY ./all_reviews_quantize.bin /fasttext/models/all_reviews.bin
+
+COPY ./fasttext_models/ag_news.ftz /fasttext/models/ag_news.ftz
+COPY ./fasttext_models/amazon_review_polarity.ftz /fasttext/models/amazon_review_polarity.ftz
+COPY ./fasttext_models/dbpedia.ftz /fasttext/models/dbpedia.ftz
+COPY ./fasttext_models/sogou_news.ftz /fasttext/models/sogou_news.ftz
+COPY ./fasttext_models/yelp_review_full.ftz /fasttext/models/yelp_review_full.ftz
+
