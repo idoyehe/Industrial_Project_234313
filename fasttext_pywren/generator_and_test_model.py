@@ -1,14 +1,15 @@
 from fastText import *
 from time import time
 
-train_file_path = "./database/all_reviews.train"
-bin_file_path = "./database/all_reviews.bin"
-test_file_path = "./database/all_reviews.test"
-quantize_file_path = "./database/all_reviews_quantize.bin"
+model_label = "all_by_label"
+train_file_path = "./database/" + model_label + ".train"
+bin_file_path = "./database/" + model_label + ".bin"
+test_file_path = "./database/" + model_label + ".test"
+quantize_file_path = "./database/" + model_label + ".ftz"
 
-generate_model = False
-test_model = False
-quantize_and_test_model = False
+generate_model = True
+test_model = True
+quantize_and_test_model = True
 
 if generate_model:
     start_time = time()
