@@ -22,18 +22,24 @@ def map_fasttext_function(key, data_stream):
     fasttext_model = fstTxt.load_model(ag_news_model)
 
     data = data_stream.read()
+    my_list =[]
     for line in data.splitlines():
-        fasttext_model.predict(str(line))
+        my_list.append(fasttext_model.predict(str(line)))
 
-    return True
+    return my_list
 
 
 def my_reduce_function(results):
-    return True
+    my_result = []
+
+    for my_list in results:
+        my_result.extend(my_list)
+    return my_result
 
 
 chunk_size = 4 * 1024 ** 2  # 4MB
 
 pw = pywren.ibm_cf_executor(runtime="fasttext-exists-models")
 pw.map_reduce(map_fasttext_function, files_to_predict[0], my_reduce_function, chunk_size)
-print(pw.get_result())
+res = pw.get_result()
+print(res)
