@@ -23,7 +23,7 @@ def map_fasttext_function(key, data_stream):
 
     data = data_stream.read()
     for line in data.splitlines():
-        fasttext_model.predict(line)
+        fasttext_model.predict(str(line))
 
     return True
 
