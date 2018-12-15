@@ -1,7 +1,7 @@
 from random import random
 from ExecuterWrapper.executorWrapper import ExecutorWrap, Location
 
-exe_location = Location.LOCAL
+exe_location = Location.PYWREN
 
 ACTIONS = 1000
 PER_ACTION = 10000000
