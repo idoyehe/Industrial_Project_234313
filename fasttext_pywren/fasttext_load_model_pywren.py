@@ -22,7 +22,7 @@ files_to_predict = list(map(lambda s: bucketname + '/' + s, files_names))
 
 def map_fasttext_function(key, data_stream):
     print('I am processing the object {}'.format(key))
-    fasttext_model = fstTxt.load_model(ag_news_model)
+    fasttext_model = fstTxt.load_model(dbpedia_model)
 
     data = data_stream.read()
     my_list = []
@@ -32,11 +32,13 @@ def map_fasttext_function(key, data_stream):
     return my_list
 
 
-def reduce_function(results):
+def reduce_function(results, futures):
     my_result = list()
     for my_list in results:
         my_result.extend(my_list)
-    return {"futures": None, "results": getsizeof(my_result)}
+    run_statuses = [f.run_status for f in futures]
+    invoke_statuses = [f.invoke_status for f in futures]
+    return {"run_statuses": run_statuses, "invoke_statuses": invoke_statuses, "results": getsizeof(my_result)}
 
 
 chunk_size = 4 * 1024 ** 2  # 4MB
@@ -44,14 +46,10 @@ chunk_size = 4 * 1024 ** 2  # 4MB
 start = time()
 
 pw = pywren.ibm_cf_executor(runtime="fasttext-exists-models")
-pw.map_reduce(map_fasttext_function, files_to_predict[0], reduce_function, chunk_size=chunk_size)
+pw.map_reduce(map_fasttext_function, files_to_predict[1], reduce_function, chunk_size=chunk_size)
 result_object = pw.get_result()
-futures = result_object['futures']
-if futures is not None:
-    run_statuses = [f.run_status for f in futures]
-    invoke_statuses = [f.invoke_status for f in futures]
-    res = {'run_statuses': run_statuses, 'invoke_statuses': invoke_statuses}
-    dump(res, open('../InvocationsGraphsFiles/statuses.pickle', 'wb'), -1)
+pw.create_timeline_plots(dst="../InvocationsGraphsFiles/", name='fasttext-model',
+                         run_statuses=result_object['run_statuses'], invoke_statuses=result_object['invoke_statuses'])
 
 end = time()
 duration = end - start
