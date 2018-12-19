@@ -22,7 +22,8 @@ def ag_news_predictions():
 
     result = list()
     for line in input_file.splitlines():
-        result.append(fasttext_model.predict(line))
+        label, prob = fasttext_model.predict(line)
+        result.append((label[0], prob[0]))
     return result
 
 
@@ -32,7 +33,8 @@ def dbpedia_predictions():
 
     result = list()
     for line in input_file.splitlines():
-        result.append(fasttext_model.predict(line))
+        label, prob = fasttext_model.predict(line)
+        result.append((label[0], prob[0]))
     return result
 
 
@@ -42,7 +44,8 @@ def yelp_predictions():
 
     result = list()
     for line in input_file.splitlines():
-        result.append(fasttext_model.predict(line))
+        label, prob = fasttext_model.predict(line)
+        result.append((label[0], prob[0]))
     return result
 
 
@@ -52,14 +55,15 @@ def sogou_news_predictions():
 
     result = list()
     for line in input_file.splitlines():
-        result.append(fasttext_model.predict(line))
+        label, prob = fasttext_model.predict(line)
+        result.append((label[0], prob[0]))
     return result
 
 
 start = time()
 
-# results = ag_news_predictions()
-results = dbpedia_predictions()
+results = ag_news_predictions()
+# results = dbpedia_predictions()
 # results = yelp_predictions()
 # results = sogou_news_predictions()
 
@@ -67,5 +71,3 @@ end = time()
 duration = end - start
 print("\nDuration: " + str(duration) + " Sec")
 print("\nResult Size: " + str(getsizeof(results)) + " Bytes")
-
-print(results)
