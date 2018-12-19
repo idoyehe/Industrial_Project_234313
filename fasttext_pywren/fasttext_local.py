@@ -1,5 +1,6 @@
 import fastText as fstTxt
 from time import time
+from sys import getsizeof
 
 ag_news_model = "./ag_news/ag_news.ftz"  # env arrange
 amazon_review_model = "./amazon_review_polarity/amazon_review_polarity.ftz"  # env arrange
@@ -57,11 +58,14 @@ def sogou_news_predictions():
 
 start = time()
 
-ag_news_predictions()
-# dbpedia_predictions()
-# yelp_predictions()
-# sogou_news_predictions()
+# results = ag_news_predictions()
+results = dbpedia_predictions()
+# results = yelp_predictions()
+# results = sogou_news_predictions()
 
 end = time()
 duration = end - start
 print("\nDuration: " + str(duration) + " Sec")
+print("\nResult Size: " + str(getsizeof(results)) + " Bytes")
+
+print(results)

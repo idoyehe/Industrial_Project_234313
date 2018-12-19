@@ -32,9 +32,9 @@ def map_fasttext_function(key, data_stream):
 
 
 def reduce_function(results, futures):
-    my_result = list()
-    for my_list in results:
-        my_result.extend(my_list)
+    all_result = list()
+    for map_list in results:
+        all_result.extend(map_list)
     run_statuses = [f.run_status for f in futures]
     invoke_statuses = [f.invoke_status for f in futures]
     return {"run_statuses": run_statuses, "invoke_statuses": invoke_statuses, "results": getsizeof(my_result)}
@@ -47,10 +47,11 @@ start = time()
 pw = pywren.ibm_cf_executor(runtime="fasttext-exists-models")
 pw.map_reduce(map_fasttext_function, files_to_predict[1], reduce_function, chunk_size=chunk_size, reducer_wait_local=False)
 result_object = pw.get_result()
-pw.create_timeline_plots(dst="../InvocationsGraphsFiles/", name='fasttext-model',
-                         run_statuses=result_object['run_statuses'], invoke_statuses=result_object['invoke_statuses'])
+if result_object['run_statuses'] and result_object['invoke_statuses']:
+    pw.create_timeline_plots(dst="../InvocationsGraphsFiles/", name='fasttext-model',
+                             run_statuses=result_object['run_statuses'], invoke_statuses=result_object['invoke_statuses'])
 
 end = time()
 duration = end - start
 print("\nDuration: " + str(duration) + " Sec")
-print("\nResult Size: " + str(result_object['results']) + " Bytes")
+# print("\nResult Size: " + str(result_object['results']) + " Bytes")
