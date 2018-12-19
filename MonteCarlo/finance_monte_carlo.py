@@ -64,7 +64,7 @@ def map_function(data=None):
     return min_f, max_f, hist_mid, hist_end
 
 
-def reduce_function(results):
+def reduce_function(results, futures):
     print(np.__version__)  # in order to import numpy
     end = current_stock.days2predict
     hist_end = list()
@@ -78,10 +78,13 @@ def reduce_function(results):
             min_f = single_map_result[0]
         if max_f is None or (single_map_result[1][end] > max_f[end]):  # setting best case by maximum last day
             max_f = single_map_result[1]
-    return {"futures": None, "results": (min_f, max_f, hist_mid, hist_end)}
+
+    run_statuses = [f.run_status for f in futures]
+    invoke_statuses = [f.invoke_status for f in futures]
+    return {"run_statuses": run_statuses, "invoke_statuses": invoke_statuses, "results": (min_f, max_f, hist_mid, hist_end)}
 
 
-executor = ExecutorWrap(MAP_INSTANCES)
+executor = ExecutorWrap(MAP_INSTANCES, "finance_monte_carlo_" + str(MAP_INSTANCES * StockData.forecasts_per_map))
 executor.set_location(exe_location)
 result_obj = executor.map_reduce_execution(map_function, iterate_data, reduce_function)
 

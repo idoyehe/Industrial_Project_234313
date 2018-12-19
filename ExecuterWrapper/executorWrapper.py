@@ -12,9 +12,10 @@ class Location(Enum):
 
 
 class ExecutorWrap(object):
-    def __init__(self, total_actions):
+    def __init__(self, total_actions, invocation_name):
         self.total_actions = total_actions
         self.execution_location = Location.LOCAL
+        self.invocation_name = invocation_name
 
     def set_location(self, new_lcl=Location.LOCAL):
         self.execution_location = new_lcl
@@ -35,12 +36,9 @@ class ExecutorWrap(object):
         pw.map_reduce(map_function, iterable_data, reduce_function, reducer_wait_local=False)
         result_object = pw.get_result()
         elapsed = time()
-        futures = result_object['futures']
-        if futures is not None:
-            run_statuses = [f.run_status for f in futures]
-            invoke_statuses = [f.invoke_status for f in futures]
-            res = {'run_statuses': run_statuses, 'invoke_statuses': invoke_statuses}
-            dump(res, open('../InvocationsGraphsFiles/statuses.pickle', 'wb'), -1)
+        if result_object['run_statuses'] and result_object['invoke_statuses']:
+            pw.create_timeline_plots(dst="../InvocationsGraphsFiles/", name=self.invocation_name,
+                                     run_statuses=result_object['run_statuses'], invoke_statuses=result_object['invoke_statuses'])
         pw.clean()
         return result_object['results'], elapsed - start_time
 

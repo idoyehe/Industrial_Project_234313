@@ -20,15 +20,17 @@ def my_map_function(curr):
     return list_points
 
 
-def my_reduce_function(results):
+def my_reduce_function(results, futures):
     sumPI = 0
     for map_result in results:
         for p in map_result:
             sumPI += p
-    return {"futures": None, "results": float(4 * (sumPI / TOTAL))}
+    run_statuses = [f.run_status for f in futures]
+    invoke_statuses = [f.invoke_status for f in futures]
+    return {"run_statuses": run_statuses, "invoke_statuses": invoke_statuses, "results": float(4 * (sumPI / TOTAL))}
 
 
-executor = ExecutorWrap(ACTIONS)
+executor = ExecutorWrap(ACTIONS, "Pi_monte_carlo_" + str(PER_ACTION * ACTIONS))
 executor.set_location(exe_location)
 result_obj = executor.map_reduce_execution(my_map_function, iterdata, my_reduce_function)
 print("Amortized PI is: ")

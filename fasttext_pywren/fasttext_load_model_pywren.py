@@ -1,7 +1,6 @@
 from time import time
 import fastText as fstTxt
 import pywren_ibm_cloud as pywren
-from pickle import dump
 from sys import getsizeof
 
 ag_news_model = "/fasttext/models/ag_news.ftz"  # from docker
@@ -41,12 +40,12 @@ def reduce_function(results, futures):
     return {"run_statuses": run_statuses, "invoke_statuses": invoke_statuses, "results": getsizeof(my_result)}
 
 
-chunk_size = 4 * 1024 ** 2  # 4MB
+chunk_size = 8 * 1024 ** 2  # 4MB
 
 start = time()
 
 pw = pywren.ibm_cf_executor(runtime="fasttext-exists-models")
-pw.map_reduce(map_fasttext_function, files_to_predict[1], reduce_function, chunk_size=chunk_size)
+pw.map_reduce(map_fasttext_function, files_to_predict[1], reduce_function, chunk_size=chunk_size, reducer_wait_local=False)
 result_object = pw.get_result()
 pw.create_timeline_plots(dst="../InvocationsGraphsFiles/", name='fasttext-model',
                          run_statuses=result_object['run_statuses'], invoke_statuses=result_object['invoke_statuses'])

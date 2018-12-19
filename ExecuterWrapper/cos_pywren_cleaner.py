@@ -5,7 +5,6 @@ import ibm_boto3
 from ibm_botocore.client import Config
 from ibm_botocore.client import ClientError
 
-PREFIX = 'pywren.jobs'
 config_filename = "~/.pywren_config"
 CONFIG = None
 bucket_name = None
@@ -54,7 +53,7 @@ def clean_pywren_cos():
     print('Deleting Bucket files...')
 
     cos = init_cos_python_object()
-    for key in get_filenames_from_cos(cos, CONFIG['pywren']['storage_bucket'], PREFIX):
+    for key in get_filenames_from_cos(cos, CONFIG['pywren']['storage_bucket'], CONFIG['pywren']['storage_prefix']):
         delete_file_from_cos(cos, CONFIG['pywren']['storage_bucket'], key)
 
     print("ALL DONE")

@@ -58,17 +58,19 @@ def map_function(data=None):
     return hist_mid, hist_end
 
 
-def reduce_function(results):
+def reduce_function(results, futures):
     print(np.__version__)  # in order to import numpy
     hist_end = list()
     hist_mid = list()
     for single_map_result in results:
         hist_end.extend(single_map_result[1])
         hist_mid.extend(single_map_result[0])
-    return {"futures": None, "results": (hist_mid, hist_end)}
+    run_statuses = [f.run_status for f in futures]
+    invoke_statuses = [f.invoke_status for f in futures]
+    return {"run_statuses": run_statuses, "invoke_statuses": invoke_statuses, "results": (hist_mid, hist_end)}
 
 
-executor = ExecutorWrap(MAP_INSTANCES)
+executor = ExecutorWrap(MAP_INSTANCES, "finance_monte_carlo_" + str(MAP_INSTANCES * StockData.forecasts_per_map))
 executor.set_location(exe_location)
 result_obj = executor.map_reduce_execution(map_function, iterdata, reduce_function)
 
