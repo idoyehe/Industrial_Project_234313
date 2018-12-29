@@ -23,16 +23,16 @@ class ExecutorWrap(object):
     def _local_execution(self, map_function, iterable_data, reduce_function):
         start_time = time()
         for i in range(self.total_actions):
-            iterable_data[i] = map_function(iterable_data[i])
-        result_object = reduce_function(iterable_data)
+            iterable_data[i] = map_function(*iterable_data[i])
+        result_object = reduce_function(iterable_data, [])
         elapsed = time()
         return result_object['results'], elapsed - start_time
 
-    def _pywren_execution(self, map_function, iterable_data, reduce_function):
+    def _pywren_execution(self, map_function, iterable_data, reduce_function, runtime):
         if self.execution_location == Location.PYWREN_DEBUG:
             logging.basicConfig(level=logging.DEBUG)
         start_time = time()
-        pw = pywren.ibm_cf_executor(runtime="pywren_3.6")
+        pw = pywren.ibm_cf_executor(runtime=runtime)
         pw.map_reduce(map_function, iterable_data, reduce_function, reducer_wait_local=False)
         result_object = pw.get_result()
         elapsed = time()
@@ -43,13 +43,13 @@ class ExecutorWrap(object):
         return result_object['results'], elapsed - start_time
 
 
-    def map_reduce_execution(self, map_function, iterable_data, reduce_function):
+    def map_reduce_execution(self, map_function, iterable_data, reduce_function, runtime="pywren_3.6"):
 
         if self.execution_location == Location.LOCAL:
             result_object, duration = self._local_execution(map_function, iterable_data, reduce_function)
         else:
             assert self.execution_location == Location.PYWREN or self.execution_location == Location.PYWREN_DEBUG
-            result_object, duration = self._pywren_execution(map_function, iterable_data, reduce_function)
+            result_object, duration = self._pywren_execution(map_function, iterable_data, reduce_function, runtime)
 
         print("\nDuration: " + str(duration) + " Sec")
         return result_object
