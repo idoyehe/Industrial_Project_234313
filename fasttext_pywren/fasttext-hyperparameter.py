@@ -1,9 +1,8 @@
 import fastText as fstTxt
-
 from ExecuterWrapper.executorWrapper import ExecutorWrap, Location
 
 exe_location = Location.PYWREN
-K = 2
+K = 4
 GIVEN_PARAMS = {
     "lr": 0.1,
     "dim": 100,
@@ -13,11 +12,18 @@ GIVEN_PARAMS = {
 
 k_list = [(i, GIVEN_PARAMS) for i in range(K)]
 
+files_names = {"dbpedia": "dbpedia.train",
+               "yelp": "yelp_review_full.train"}
+
+path_docker = "/fasttext/validation/"
+
+chosen_model = files_names["yelp"]
+
 
 def map_k_cross_validation(valid_index, parameters_dict):
-    source_path = "/fasttext/validation/dbpedia.train"
-    valid_path = "/fasttext/validation/source.vaild"
-    train_path = "/fasttext/validation/source.train"
+    source_path = path_docker + chosen_model
+    valid_path = path_docker + "source.vaild"
+    train_path = path_docker + "source.train"
 
     input_file = open(source_path, 'r').read()
     train_file = open(train_path, 'w')

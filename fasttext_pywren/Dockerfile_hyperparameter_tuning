@@ -42,3 +42,4 @@ RUN pip install /fasttext/package/.
 RUN mkdir -p /fasttext/validation
 
 COPY ./dbpedia.train /fasttext/validation/dbpedia.train
+COPY ./yelp_review_full.train /fasttext/validation/yelp_review_full.train
