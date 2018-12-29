@@ -4,22 +4,21 @@ import pywren_ibm_cloud as pywren
 from sys import getsizeof
 
 ag_news_model = "/fasttext/models/ag_news.ftz"  # from docker
-amazon_review_model = "/fasttext/models/amazon_review_polarity.ftz"  # from docker
 dbpedia_model = "/fasttext/models/dbpedia.ftz"  # from docker
-sogou_news_model = "/fasttext/models/sogou_news.ftz"  # from docker
 yelp_review_model = "/fasttext/models/yelp_review_full.ftz"  # from docker
+sogou_news_model = "/fasttext/models/sogou_news.ftz"  # from docker
 
 bucketname = 'fasttext-predict-bucket'
 
 files_names = ['ag_news_predict.txt',  # 27.6 MB ~ 40 sec
                'dbpedia_predict.txt',  # 164.8 MB ~ 158.247 sec when chunk size is 4MB
-               'sogou_predict.txt',  # 1.2 GB ~ 90 sec when chunk size is 16MB ~ 144 sec
-               'yelp_review_predict.txt']  # 456.2 MB ~ 247 MB
+               'yelp_review_predict.txt',  # 456.2 MB ~ 247 sec
+               'sogou_predict.txt']  # 1.2 GB ~ 90 sec when chunk size is 16MB ~ 144 sec
 
 files_to_predict = list(map(lambda s: bucketname + '/' + s, files_names))
 
 
-def map_fasttext_function(key, data_stream):
+def map_fasttext_prediction(key, data_stream):
     print('I am processing the object {}'.format(key))
     fasttext_model = fstTxt.load_model(ag_news_model)
 
@@ -37,7 +36,7 @@ def reduce_function(results, futures):
         all_result.extend(labels_list)
     run_statuses = [f.run_status for f in futures]
     invoke_statuses = [f.invoke_status for f in futures]
-    return {"run_statuses": run_statuses, "invoke_statuses": invoke_statuses, "results": getsizeof(all_result)}
+    return {"run_statuses": run_statuses, "invoke_statuses": invoke_statuses, "results": all_result}
 
 
 chunk_size = 4 * 1024 ** 2  # 4MB
@@ -45,7 +44,7 @@ chunk_size = 4 * 1024 ** 2  # 4MB
 start = time()
 
 pw = pywren.ibm_cf_executor(runtime="fasttext-exists-models")
-pw.map_reduce(map_fasttext_function, files_to_predict[0], reduce_function, chunk_size=chunk_size, reducer_wait_local=False)
+pw.map_reduce(map_fasttext_prediction, files_to_predict[3], reduce_function, chunk_size=chunk_size, reducer_wait_local=False)
 result_object = pw.get_result()
 if result_object['run_statuses'] and result_object['invoke_statuses']:
     pw.create_timeline_plots(dst="../InvocationsGraphsFiles/", name='fasttext-model',
