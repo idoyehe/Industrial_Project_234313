@@ -1,92 +1,97 @@
 import fastText as fstTxt
 import pywren_ibm_cloud as pywren
 from time import time
-from ExecuterWrapper.executorWrapper import ExecutorWrap, Location
-
-exe_location = Location.PYWREN
-GIVEN_PARAMS = {
-    "lr": 0.1,
-    "dim": 100,
-    "ws": 5,
-    "epoch": 5,
-    "minCount": 1}
 
 files_names = {"dbpedia": "dbpedia.train",
                "yelp": "yelp_review_full.train"}
 
-
-chosen_model = files_names["yelp"]
-
 bucketname = 'fasttext-train-bucket'
-train_file = [bucketname + "/" + files_names["dbpedia"]]
+
+files_to_predict = dict()
+
+for key, value in files_names.items():
+    files_names[key] = bucketname + '/' + value
+
+iter_parameters = [{
+    "lr": 0.3,
+    "dim": 100,
+    "ws": 5,
+    "epoch": 7,
+    "minCount": 1},
+    {"lr": 0.1,
+     "dim": 100,
+     "ws": 5,
+     "epoch": 5,
+     "minCount": 1}]
 
 
-def map_k_cross_validation(valid_index, stream):
-    path_docker = "/fasttext/validation/"
-    source_path = path_docker + chosen_model
-    valid_path = path_docker + "source.vaild"
-    train_path = path_docker + "source.train"
+class HyperParameterTuning(object):
+    def __init__(self, path_docker: str, parameters_dict: dict, k_value: int, index: int):
+        self.path_docker = path_docker
+        self.parameters_dict = parameters_dict
+        self.k_value = k_value
+        self.index = index
 
-    input_file = stream
-    train_file = open(train_path, 'w')
-    valid_file = open(valid_path, 'w')
+    def map_k_cross_validation(self, data_stream):
+        valid_path = self.path_docker + "source.valid"
+        train_path = self.path_docker + "source.train"
 
-    current_index = 0
-    for line in input_file:
-        str_line = str(line) + "\n"
-        if current_index % 4 == valid_index:
-            valid_file.write(str_line)
-        else:
-            train_file.write(str_line)
+        valid_index = 0  # should get as function argument
 
-        current_index += 1
+        train_file = open(train_path, 'w')
+        valid_file = open(valid_path, 'w')
 
-    valid_file.close()
-    train_file.close()
+        current_index = 0
+        for line in data_stream.splitlines():
+            str_line = line  # line.decode('utf-8') incase data comes from COS
+            str_line += "\n"
+            if current_index % self.k_value == valid_index:
+                valid_file.write(str_line)
+            else:
+                train_file.write(str_line)
 
-    parameters_dict = {
-        "lr": 0.1,
-        "dim": 100,
-        "ws": 5,
-        "epoch": 5,
-        "minCount": 1}
+            current_index += 1
 
-    to_valid_model = fstTxt.train_supervised(train_path, **parameters_dict)
-    result = to_valid_model.test(valid_path)
-    return {"precision": result[1], "recall": result[2]}
+        valid_file.close()
+        train_file.close()
 
-
+        to_valid_model = fstTxt.train_supervised(train_path, **self.parameters_dict)
+        result = to_valid_model.test(valid_path)
+        return {"pre": result[1], "rec": result[2]}
 
 
-def reducer_average_validator(results):
-    avg_precision = 0
-    avg_recall = 0
-    for current in results:
-        avg_precision += current["precision"]
-        avg_recall += current["recall"]
+def map_evaluate_parameters(lr, dim, ws, epoch, minCount):
+    k_value = 4
 
-    avg_precision /= len(results)
-    avg_recall /= len(results)
-    avg_result = {"precision": avg_precision, "recall": avg_recall}
-    return avg_result
+    k_list = [i for i in range(k_value)]  # bottleneck
 
+    parameters = {"lr": lr, "dim": dim, "ws": ws, "epoch": epoch, "minCount": minCount}
 
-def map_evaluate_parameters(key, data_stream):
-    K = 4
+    def k_cross_validtion_wrap(index):
+        data_stream = open("/fasttext/validation/dbpedia.train", "r").read()  # should be with COS
+        hyper = HyperParameterTuning("/fasttext/validation/", parameters, k_value, index)
+        return hyper.map_k_cross_validation(data_stream)
 
-    stream = [line.decode("utf-8") for line in data_stream.read().splitlines()]  # bottleneck
+    def reducer_average_validator(results):
+        avg_precision = 0
+        avg_recall = 0
+        for res in results:
+            avg_precision += res["pre"]
+            avg_recall += res["rec"]
 
-    k_list = [(i, stream) for i in range(K)]  # bottleneck
-    subpw = pywren.ibm_cf_executor(runtime="fasttext-hyperparameter")
-    subpw.map_reduce(map_k_cross_validation, k_list, reducer_average_validator, reducer_wait_local=False)
-    result_object = subpw.get_result()
-    return result_object
+        avg_precision /= len(results)
+        avg_recall /= len(results)
+        return {"precision": avg_precision, "recall": avg_recall}
+
+    sub_pw = pywren.ibm_cf_executor(runtime="fasttext-hyperparameter")
+    sub_pw.map_reduce(k_cross_validtion_wrap, k_list, reducer_average_validator, reducer_wait_local=False)
+    return sub_pw.get_result()
 
 
 start = time()
 pw = pywren.ibm_cf_executor(runtime="fasttext-hyperparameter")
-pw.map(map_evaluate_parameters, train_file)
-res = pw.get_result()
+pw.map(map_evaluate_parameters, iter_parameters)
+pw_res = pw.get_result()
 end = time()
 print("\nDuration: " + str(end - start) + " Sec")
-print("Results: ", res)
+print("Results: ", pw_res)
