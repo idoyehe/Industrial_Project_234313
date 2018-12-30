@@ -13,7 +13,7 @@ for key, value in files_names.items():
     files_names[key] = bucketname + '/' + value
 
 iter_parameters = [{
-    "lr": 0.3,
+    "lr": 0.6,
     "dim": 100,
     "ws": 5,
     "epoch": 7,
@@ -21,7 +21,7 @@ iter_parameters = [{
     {"lr": 0.1,
      "dim": 100,
      "ws": 5,
-     "epoch": 5,
+     "epoch": 1,
      "minCount": 1}]
 
 
