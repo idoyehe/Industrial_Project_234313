@@ -17,7 +17,13 @@ iter_parameters = [{
      "dim": 100,
      "ws": 5,
      "epoch": 1,
-     "minCount": 1}]
+     "minCount": 1},
+    {"lr": 1,
+     "dim": 100,
+     "ws": 5,
+     "epoch": 2,
+     "minCount": 1}
+]
 
 
 def fastText_evaluate(parameters_dict, train_path, test_path):
@@ -26,7 +32,7 @@ def fastText_evaluate(parameters_dict, train_path, test_path):
     return {"precision": result[1], "recall": result[2]}
 
 
-hyperparameters = pywren_hyperparameter.PywrenHyperParameterUtil(fastText_evaluate, bucketname, files_names["yelp"])
+hyperparameters = pywren_hyperparameter.PywrenHyperParameterUtil(fastText_evaluate, bucketname, files_names["dbpedia"])
 hyperparameters.set_kvalue(4)
 hyperparameters.set_parameters(iter_parameters)
-print(hyperparameters.evalute_params(runtime="fasttext-hyperparameter"))
+print(hyperparameters.evaluate_params(runtime="fasttext-hyperparameter"))

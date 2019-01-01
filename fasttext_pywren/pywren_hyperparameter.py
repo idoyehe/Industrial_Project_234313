@@ -7,6 +7,14 @@ from time import time
 class PywrenHyperParameterUtil(object):
     def __init__(self, evalute_learning_algo_function: types.FunctionType, bucket_name: str, file_key: str, k_value: int = 5,
                  path_docker: str = None):
+        """
+        :param evalute_learning_algo_function: function to evaluate model with given parameters
+            it signature should be  (parameters_dict, train_path, test_path) and return {"precision": precision, "recall": recall}
+        :param bucket_name: the bucket name stores train file
+        :param file_key: train file name as stores in bucket given bucket
+        :param k_value: k for the k fold cross validation
+        :param path_docker: specific folder to save temporary files, can be none and will create while run time
+        """
         self.file_key = file_key
         self.bucket_name = bucket_name
         self.evalute_learning_algo_function = evalute_learning_algo_function
@@ -17,18 +25,29 @@ class PywrenHyperParameterUtil(object):
         self.runtime = None
 
     def set_kvalue(self, mew_k_value: int):
+        """
+        :param mew_k_value: new k value to preform k fold cross validation
+        :return: nothing
+        """
         self.k_value = mew_k_value
-        # if self.parameters_list is list:
-        #     for index, params in enumerate(self.parameters_list):
-        #         self.parameters_list[index] = (self.k_value, params)
 
     def set_parameters(self, parameters_list: list):
-        self.parameters_list = parameters_list
-        # self.parameters_list = list()
-        # for params in parameters_list:
-        #     self.parameters_list.append((self.k_value, params))
+        """
+        :param parameters_list: list of parameters to evaluate
+        :return:
+        """
+        if type(parameters_list) is not list:
+            raise TypeError("parameters_list should be list object")
 
-    def evalute_params(self, runtime="pywren_3.6"):
+        self.parameters_list = parameters_list
+
+    def evaluate_params(self, runtime="pywren_3.6"):
+        """
+        :param runtime: thr action in cloud to invoke
+        :return: a dict that has 2 keys:
+            Results list of evaluation of all set of parameters
+            Duration the time spent to pywren for execution
+        """
         self.runtime = runtime
         start = time()
         pw = pywren.ibm_cf_executor(runtime=self.runtime)
@@ -36,7 +55,7 @@ class PywrenHyperParameterUtil(object):
         pw_res = pw.get_result()
         duration = time() - start
         self.runtime = None
-        return {"Results: ": pw_res, "Duration": duration}
+        return {"Results": pw_res, "Duration": duration}
 
     def __map_k_fold_cross_validation(self, data_stream, params_dict, valid_index):
         if self.path_docker is None:
@@ -77,7 +96,8 @@ class PywrenHyperParameterUtil(object):
         avg_recall /= len(results)
         return {"precision": avg_precision, "recall": avg_recall}
 
-    def __map_evaluate_parameters(self, lr, dim, ws, epoch, minCount, ibm_cos):  # workaround should get one dict and not knows the parameters
+    def __map_evaluate_parameters(self, lr, dim, ws, epoch, minCount, ibm_cos):
+        # workaround should get one dict and not knows the parameters
 
         parameters_dict = {"lr": lr, "dim": dim, "ws": ws, "epoch": epoch, "minCount": minCount}
         k_list = [i for i in range(self.k_value)]
