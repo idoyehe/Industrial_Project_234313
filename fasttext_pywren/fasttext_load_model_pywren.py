@@ -1,7 +1,6 @@
 from time import time
 import fastText as fstTxt
 import pywren_ibm_cloud as pywren
-from sys import getsizeof
 
 ag_news_model = "/fasttext/models/ag_news.ftz"  # from docker
 dbpedia_model = "/fasttext/models/dbpedia.ftz"  # from docker
@@ -53,4 +52,3 @@ if result_object['run_statuses'] and result_object['invoke_statuses']:
 end = time()
 duration = end - start
 print("\nDuration: " + str(duration) + " Sec")
-# print("\nResult Size: " + str(result_object['results']) + " Bytes")

@@ -8,13 +8,16 @@ pw.get_all_result()
 """
 import pywren_ibm_cloud as pywren
 
-iterdata = [1, 2, 3, 4]
+class Ido(object):
+    def __init__(self):
+        self.iterdata = [(1, {"ido": 1}), (2, {"ido": 1}), (3, {"ido": 1}), (4, {"ido": 1})]
+        self.A = 7
 
+    def my_map_function(self, x, y):
+        return x + self.A, y
 
-def my_map_function(x):
-    return x + 7
-
+ido = Ido()
 
 pw = pywren.ibm_cf_executor()
-pw.map(my_map_function, iterdata)
+pw.map(ido.my_map_function, ido.iterdata)
 print(pw.get_result())
