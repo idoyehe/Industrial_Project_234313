@@ -1,5 +1,5 @@
 import fastText as fstTxt
-from fasttext_pywren.HyperParametersEvaluate import pywren_hyperparameter
+from fasttext_pywren.HyperParametersEvaluate import pywrenGenericHyperparameterEvaluate
 
 files_names = {"dbpedia": "dbpedia.train",
                "yelp": "yelp_review_full.train"}
@@ -32,7 +32,7 @@ def fastText_evaluate(parameters_dict, train_path, test_path):
     return {"precision": result[1], "recall": result[2]}
 
 
-hyperparameters = pywren_hyperparameter.PywrenHyperParameterUtil(fastText_evaluate, bucketname, files_names["dbpedia"])
+hyperparameters = pywrenGenericHyperparameterEvaluate.PywrenHyperParameterUtil(fastText_evaluate, bucketname, files_names["dbpedia"])
 hyperparameters.set_kvalue(5)
 hyperparameters.set_parameters(iter_parameters)
 print(hyperparameters.evaluate_params(runtime="fasttext-hyperparameter"))
