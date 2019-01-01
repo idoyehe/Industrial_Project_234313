@@ -1,5 +1,5 @@
 import fastText as fstTxt
-from fasttext_pywren import pywren_hyperparameter
+from fasttext_pywren.HyperParametersEvaluate import pywren_hyperparameter
 
 files_names = {"dbpedia": "dbpedia.train",
                "yelp": "yelp_review_full.train"}
