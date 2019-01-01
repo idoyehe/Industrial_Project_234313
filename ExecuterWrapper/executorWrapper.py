@@ -1,7 +1,6 @@
 from enum import Enum
 from time import time
 import pywren_ibm_cloud as pywren
-from pickle import dump
 import logging
 
 
@@ -16,6 +15,7 @@ class ExecutorWrap(object):
         self.total_actions = total_actions
         self.execution_location = Location.LOCAL
         self.invocation_name = invocation_name
+        self.duration = None
 
     def set_location(self, new_lcl=Location.LOCAL):
         self.execution_location = new_lcl
@@ -28,28 +28,31 @@ class ExecutorWrap(object):
         elapsed = time()
         return result_object['results'], elapsed - start_time
 
-    def _pywren_execution(self, map_function, iterable_data, reduce_function, runtime):
+    def _pywren_execution(self, map_function, iterable_data, reduce_function, chunk_size, runtime):
         if self.execution_location == Location.PYWREN_DEBUG:
             logging.basicConfig(level=logging.DEBUG)
         start_time = time()
         pw = pywren.ibm_cf_executor(runtime=runtime)
-        pw.map_reduce(map_function, iterable_data, reduce_function, reducer_wait_local=False)
+        pw.map_reduce(map_function, iterable_data, reduce_function, chunk_size=chunk_size, reducer_wait_local=False)
         result_object = pw.get_result()
         elapsed = time()
-        if result_object['run_statuses'] and result_object['invoke_statuses']:
+        if result_object.get('run_statuses', False) and result_object.get('invoke_statuses', False):
             pw.create_timeline_plots(dst="../InvocationsGraphsFiles/", name=self.invocation_name,
                                      run_statuses=result_object['run_statuses'], invoke_statuses=result_object['invoke_statuses'])
         pw.clean()
         return result_object['results'], elapsed - start_time
 
-
-    def map_reduce_execution(self, map_function, iterable_data, reduce_function, runtime="pywren_3.6"):
+    def map_reduce_execution(self, map_function, iterable_data, reduce_function, chunk_size=None, runtime="pywren_3.6"):
 
         if self.execution_location == Location.LOCAL:
             result_object, duration = self._local_execution(map_function, iterable_data, reduce_function)
         else:
             assert self.execution_location == Location.PYWREN or self.execution_location == Location.PYWREN_DEBUG
-            result_object, duration = self._pywren_execution(map_function, iterable_data, reduce_function, runtime)
+            result_object, duration = self._pywren_execution(map_function, iterable_data, reduce_function, chunk_size, runtime)
 
+        self.duration = duration
         print("\nDuration: " + str(duration) + " Sec")
         return result_object
+
+    def get_last_duration(self):
+        return self.duration
