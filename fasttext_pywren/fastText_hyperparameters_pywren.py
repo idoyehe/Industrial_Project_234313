@@ -33,6 +33,10 @@ def fastText_evaluate(parameters_dict, train_path, test_path):
 
 
 hyperparameters = pywren_hyperparameter.PywrenHyperParameterUtil(fastText_evaluate, bucketname, files_names["dbpedia"])
-hyperparameters.set_kvalue(4)
+hyperparameters.set_kvalue(5)
 hyperparameters.set_parameters(iter_parameters)
 print(hyperparameters.evaluate_params(runtime="fasttext-hyperparameter"))
+
+
+
+

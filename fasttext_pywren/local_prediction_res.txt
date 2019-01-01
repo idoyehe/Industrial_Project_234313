@@ -1,0 +1,31 @@
+ag_news_predict size: 29MB
+index:  0 time:  3.1305267810821533
+index:  1 time:  3.663815975189209
+index:  2 time:  3.452904224395752
+index:  3 time:  3.2598021030426025
+index:  4 time:  3.503380060195923
+Avg_time:  3.4020858287811278
+
+dbpedia_predict size: 172.8MB
+index:  0 time:  19.214625120162964
+index:  1 time:  19.742458820343018
+index:  2 time:  19.09011697769165
+index:  3 time:  20.773757934570312
+index:  4 time:  19.245950937271118
+Avg_time:  19.613381958007814
+
+yelp_predictions size: 478.4MB
+index:  0 time:  51.21796798706055
+index:  1 time:  41.68530082702637
+index:  2 time:  40.149641036987305
+index:  3 time:  41.76298689842224
+index:  4 time:  41.241024017333984
+Avg_time:  43.21138415336609
+
+sogou_news_predictions size: 1.26GB
+index:  0 time:  136.71790885925293
+index:  1 time:  128.19786190986633
+index:  2 time:  148.67168807983398
+index:  3 time:  155.63567996025085
+index:  4 time:  132.09420490264893
+Avg_time:  140.2634687423706
