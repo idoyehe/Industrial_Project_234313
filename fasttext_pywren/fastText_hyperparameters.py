@@ -6,10 +6,6 @@ files_names = {"dbpedia": "dbpedia.train",
 
 bucketname = 'fasttext-train-bucket'
 
-files_to_predict = dict()
-
-for key, value in files_names.items():
-    files_names[key] = bucketname + '/' + value
 
 iter_parameters = [{
     "lr": 0.6,
@@ -30,7 +26,7 @@ def fastText_evaluate(parameters_dict, train_path, test_path):
     return {"precision": result[1], "recall": result[2]}
 
 
-hyperparameters = pywren_hyperparameter.PywrenHyperParameterUtil(fastText_evaluate, bucketname, files_names["dbpedia"])
+hyperparameters = pywren_hyperparameter.PywrenHyperParameterUtil(fastText_evaluate, bucketname, files_names["yelp"])
 hyperparameters.set_kvalue(4)
 hyperparameters.set_parameters(iter_parameters)
 print(hyperparameters.evalute_params(runtime="fasttext-hyperparameter"))
