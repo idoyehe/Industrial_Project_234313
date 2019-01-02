@@ -2,27 +2,22 @@ import fastText as fstTxt
 from time import time
 import os
 
-files_names = {"dbpedia": ("./dbpedia", "dbpedia.train"),
-               "yelp": ("./yelp_review_full", "yelp_review_full.train")}
+files_names = {"dbpedia": ("../Models/dbpedia", "dbpedia.train"),
+               "yelp": ("../Models/yelp_review_full", "yelp_review_full.train")}
 
-iter_parameters = [{
-    "lr": 0.6,
-    "dim": 100,
-    "ws": 5,
-    "epoch": 7,
-    "minCount": 1},
-    {"lr": 0.1,
-     "dim": 100,
-     "ws": 5,
-     "epoch": 1,
-     "minCount": 1},
-    {"lr": 1,
-     "dim": 100,
-     "ws": 5,
-     "epoch": 2,
-     "minCount": 1}
-]
+iter_parameters = \
+    [{'lr': 0.2, 'lrUpdateRate': 50, 'ws': 4, 'epoch': 13}, {'lr': 0.8, 'lrUpdateRate': 90, 'ws': 5, 'epoch': 11},
+     {'lr': 0.7, 'lrUpdateRate': 70, 'ws': 6, 'epoch': 8}, {'lr': 0.4, 'lrUpdateRate': 70, 'ws': 7, 'epoch': 8},
+     {'lr': 0.7, 'lrUpdateRate': 90, 'ws': 7, 'epoch': 9}, {'lr': 0.5, 'lrUpdateRate': 40, 'ws': 6, 'epoch': 14},
+     {'lr': 0.5, 'lrUpdateRate': 40, 'ws': 5, 'epoch': 15}, {'lr': 0.6, 'lrUpdateRate': 40, 'ws': 4, 'epoch': 7},
+     {'lr': 0.7, 'lrUpdateRate': 30, 'ws': 7, 'epoch': 10}, {'lr': 0.3, 'lrUpdateRate': 80, 'ws': 6, 'epoch': 6},
+     {'lr': 0.8, 'lrUpdateRate': 70, 'ws': 4, 'epoch': 6}, {'lr': 0.1, 'lrUpdateRate': 60, 'ws': 3, 'epoch': 14},
+     {'lr': 0.4, 'lrUpdateRate': 80, 'ws': 6, 'epoch': 12}, {'lr': 0.5, 'lrUpdateRate': 80, 'ws': 6, 'epoch': 11},
+     {'lr': 0.3, 'lrUpdateRate': 90, 'ws': 5, 'epoch': 14}, {'lr': 0.1, 'lrUpdateRate': 20, 'ws': 6, 'epoch': 6},
+     {'lr': 0.1, 'lrUpdateRate': 20, 'ws': 4, 'epoch': 14}, {'lr': 0.6, 'lrUpdateRate': 30, 'ws': 6, 'epoch': 14},
+     {'lr': 0.3, 'lrUpdateRate': 50, 'ws': 7, 'epoch': 10}, {'lr': 0.3, 'lrUpdateRate': 40, 'ws': 7, 'epoch': 9}]
 
+K = 5
 
 def fastText_evaluate(parameters_dict, train_path, test_path):
     to_valid_model = fstTxt.train_supervised(train_path, **parameters_dict)
@@ -71,16 +66,16 @@ def reducer_average_validator(results):
     return {"precision": avg_precision, "recall": avg_recall}
 
 
-K = 5
 total_results = {"Results": list(), "Duration": None}
 
-start = time()
-for current_params in iter_parameters:
-    results = list()
-    for index in range(K):
-        results.append(
-            map_k_fold_cross_validation(files_names["dbpedia"][0], files_names["dbpedia"][1], current_params, K, index))
-    total_results["Results"].append(reducer_average_validator(results))
-total_results["Duration"] = time() - start
+for i in range(3):
+    start = time()
+    for current_params in iter_parameters:
+        results = list()
+        for index in range(K):
+            results.append(
+                map_k_fold_cross_validation(files_names["dbpedia"][0], files_names["dbpedia"][1], current_params, K, index))
+        total_results["Results"].append(reducer_average_validator(results))
+    total_results["Duration"] = time() - start
 
-print(total_results)
+    print(total_results)

@@ -5,10 +5,11 @@ from time import time
 
 
 class PywrenHyperParameterUtil(object):
-    def __init__(self, evalute_learning_algo_function: types.FunctionType, bucket_name: str, file_key: str, k_value: int = 5,
-                 path_docker: str = None):
+    def __init__(self, evaluate_learning_algo_function: types.FunctionType, bucket_name: str, file_key: str,
+                 k_value: int = 5, job_name: str = None, graphs_path: str = None, path_docker: str = None):
         """
-        :param evalute_learning_algo_function: function to evaluate model with given parameters
+        :param job_name: job name for invocation graphs
+        :param evaluate_learning_algo_function: function to evaluate model with given parameters
             it signature should be  (parameters_dict, train_path, test_path) and return {"precision": precision, "recall": recall}
         :param bucket_name: the bucket name stores train file
         :param file_key: train file name as stores in bucket given bucket
@@ -17,10 +18,12 @@ class PywrenHyperParameterUtil(object):
         """
         self.file_key = file_key
         self.bucket_name = bucket_name
-        self.evalute_learning_algo_function = evalute_learning_algo_function
+        self.evalute_learning_algo_function = evaluate_learning_algo_function
         self.path_docker = path_docker
         self.k_value = k_value
         self.path_docker_default = "/hyperParametersTuning/"
+        self.job_name = job_name
+        self.graphs_path = graphs_path
         self.parameters_list = None
         self.runtime = None
 
@@ -55,6 +58,8 @@ class PywrenHyperParameterUtil(object):
         pw_res = pw.get_result()
         duration = time() - start
         self.runtime = None
+        if self.job_name and self.graphs_path:
+            pw.create_timeline_plots(dst=self.graphs_path, name=self.job_name)
         return {"Results": pw_res, "Duration": duration}
 
     def __map_k_fold_cross_validation(self, data_stream, params_dict, valid_index):
@@ -96,10 +101,10 @@ class PywrenHyperParameterUtil(object):
         avg_recall /= len(results)
         return {"precision": avg_precision, "recall": avg_recall}
 
-    def __map_evaluate_parameters(self, lr, dim, ws, epoch, minCount, ibm_cos):
+    def __map_evaluate_parameters(self, lr, lrUpdateRate, ws, epoch, ibm_cos):
         # workaround should get one dict and not knows the parameters
 
-        parameters_dict = {"lr": lr, "dim": dim, "ws": ws, "epoch": epoch, "minCount": minCount}
+        parameters_dict = {"lr": lr, "lrUpdateRate": lrUpdateRate, "ws": ws, "epoch": epoch}
         k_list = [i for i in range(self.k_value)]
 
         def __k_fold_cross_validtion_wrap(valid_index, ibm_cos):
