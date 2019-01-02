@@ -1,6 +1,6 @@
 from random import choice
 
-list_size = 100
+list_size = 75
 
 lr_values = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
 

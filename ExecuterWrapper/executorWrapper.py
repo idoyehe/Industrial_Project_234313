@@ -11,10 +11,11 @@ class Location(Enum):
 
 
 class ExecutorWrap(object):
-    def __init__(self, total_actions, invocation_name):
+    def __init__(self, total_actions, invocation_name, graphs_path=None):
         self.total_actions = total_actions
         self.execution_location = Location.LOCAL
         self.invocation_name = invocation_name
+        self.graphs_path = graphs_path if graphs_path else "../InvocationsGraphsFiles/"
         self.duration = None
 
     def set_location(self, new_lcl=Location.LOCAL):
@@ -37,7 +38,7 @@ class ExecutorWrap(object):
         result_object = pw.get_result()
         elapsed = time()
         if result_object.get('run_statuses', False) and result_object.get('invoke_statuses', False):
-            pw.create_timeline_plots(dst="../InvocationsGraphsFiles/", name=self.invocation_name,
+            pw.create_timeline_plots(dst=self.graphs_path, name=self.invocation_name,
                                      run_statuses=result_object['run_statuses'], invoke_statuses=result_object['invoke_statuses'])
         pw.clean()
         return result_object['results'], elapsed - start_time

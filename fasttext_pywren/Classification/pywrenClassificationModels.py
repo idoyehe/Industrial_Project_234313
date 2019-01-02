@@ -20,7 +20,7 @@ files_to_predict = list(map(lambda s: bucketname + '/' + s, files_names))
 
 def map_fasttext_classification(key, data_stream):
     print('I am processing the object {}'.format(key))
-    fasttext_model = fstTxt.load_model(sogou_news_model)
+    fasttext_model = fstTxt.load_model(ag_news_model)
 
     data = data_stream.read()
     result = list()
@@ -38,15 +38,16 @@ def reduce_function(results, futures):
     return {"run_statuses": run_statuses, "invoke_statuses": invoke_statuses, "results": all_result}
 
 
-chunk_size = 24 * 1024 ** 2  # 4MB
-current_index = 3
+chunk_size = 4 * 1024 ** 2  # 4MB
+current_index = 0
 
 repeats = 1
 total_duration = 0
-title = "sogou_news_24MB_chunks"
+title = ""
+graph_path = "../../InvocationsGraphsFiles/"
 
 for index in range(repeats):
-    executor = ExecutorWrap(0, title)
+    executor = ExecutorWrap(0, title, graph_path)
     executor.set_location(exe_location)
     result_obj = executor.map_reduce_execution(map_fasttext_classification,
                                                files_to_predict[current_index],

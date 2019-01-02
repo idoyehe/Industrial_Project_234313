@@ -7,24 +7,10 @@ files_names = {"dbpedia": "dbpedia.train",
 bucketname = 'fasttext-train-bucket'
 
 
-iter_parameters = [{
-    "lr": 0.6,
-    "dim": 100,
-    "ws": 5,
-    "epoch": 7,
-    "minCount": 1},
-    {"lr": 0.1,
-     "dim": 100,
-     "ws": 5,
-     "epoch": 1,
-     "minCount": 1},
-    {"lr": 1,
-     "dim": 100,
-     "ws": 5,
-     "epoch": 2,
-     "minCount": 1}
-]
+iter_parameters = \
+ [{'lr': 0.3, 'lrUpdateRate': 80, 'ws': 6, 'epoch': 5}]
 
+K = 1
 
 def fastText_evaluate(parameters_dict, train_path, test_path):
     to_valid_model = fstTxt.train_supervised(train_path, **parameters_dict)
@@ -32,10 +18,15 @@ def fastText_evaluate(parameters_dict, train_path, test_path):
     return {"precision": result[1], "recall": result[2]}
 
 
-hyperparameters = pywrenGenericHyperparameterEvaluate.PywrenHyperParameterUtil(fastText_evaluate, bucketname, files_names["dbpedia"])
-hyperparameters.set_kvalue(5)
+hyperparameters = pywrenGenericHyperparameterEvaluate.PywrenHyperParameterUtil(fastText_evaluate, bucketname,
+                                                                               files_names["dbpedia"],
+                                                                               job_name="fastText_hyperparameters_evaluate_yelp",
+                                                                               graphs_path="../../InvocationsGraphsFiles/")
+hyperparameters.set_kvalue(K)
 hyperparameters.set_parameters(iter_parameters)
-print(hyperparameters.evaluate_params(runtime="fasttext-hyperparameter"))
+
+for i in range(1):
+    print(hyperparameters.evaluate_params(runtime="fasttext-hyperparameter"))
 
 
 
