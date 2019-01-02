@@ -5,14 +5,11 @@ import os
 files_names = {"dbpedia": ("../Models/dbpedia", "dbpedia.train"),
                "yelp": ("../Models/yelp_review_full", "yelp_review_full.train")}
 
+"""example"""
 iter_parameters = \
-    [{'lr': 0.5, 'lrUpdateRate': 60, 'ws': 3, 'epoch': 6}, {'lr': 1, 'lrUpdateRate': 30, 'ws': 5, 'epoch': 7},
-     {'lr': 0.6, 'lrUpdateRate': 70, 'ws': 4, 'epoch': 13}, {'lr': 0.5, 'lrUpdateRate': 70, 'ws': 7, 'epoch': 7},
-     {'lr': 0.5, 'lrUpdateRate': 50, 'ws': 4, 'epoch': 6}, {'lr': 0.9, 'lrUpdateRate': 100, 'ws': 6, 'epoch': 12},
-     {'lr': 0.5, 'lrUpdateRate': 50, 'ws': 5, 'epoch': 11}, {'lr': 0.3, 'lrUpdateRate': 30, 'ws': 7, 'epoch': 11},
-     {'lr': 0.6, 'lrUpdateRate': 30, 'ws': 7, 'epoch': 13}, {'lr': 0.6, 'lrUpdateRate': 30, 'ws': 6, 'epoch': 5}]
+    [{'lr': 0.3, 'lrUpdateRate': 80, 'ws': 6, 'epoch': 5}]
 
-K = 5
+K = 1
 
 def fastText_evaluate(parameters_dict, train_path, test_path):
     to_valid_model = fstTxt.train_supervised(train_path, **parameters_dict)
