@@ -1,6 +1,6 @@
 from random import choice
 
-list_size = 75
+list_size = 50
 
 lr_values = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
 
@@ -17,6 +17,6 @@ for i in range(list_size):
         "lrUpdateRate": choice(lrUpdateRate_values),
         "ws": choice(ws_values),
         "epoch": choice(epoch_values)}
-    iter_hyperparameters.append(hyperparameters_set)
+    iter_hyperparameters.append([hyperparameters_set])
 
 print(iter_hyperparameters)

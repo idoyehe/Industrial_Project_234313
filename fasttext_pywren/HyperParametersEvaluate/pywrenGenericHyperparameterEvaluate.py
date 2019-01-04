@@ -6,21 +6,20 @@ from time import time
 
 class PywrenHyperParameterUtil(object):
     def __init__(self, evaluate_learning_algo_function: types.FunctionType, bucket_name: str, file_key: str,
-                 k_value: int = 5, job_name: str = None, graphs_path: str = None, path_docker: str = None):
+                 job_name: str = None, graphs_path: str = None, path_docker: str = None):
         """
         :param job_name: job name for invocation graphs
         :param evaluate_learning_algo_function: function to evaluate model with given parameters
             it signature should be  (parameters_dict, train_path, test_path) and return {"precision": precision, "recall": recall}
         :param bucket_name: the bucket name stores train file
         :param file_key: train file name as stores in bucket given bucket
-        :param k_value: k for the k fold cross validation
         :param path_docker: specific folder to save temporary files, can be none and will create while run time
         """
         self.file_key = file_key
         self.bucket_name = bucket_name
         self.evalute_learning_algo_function = evaluate_learning_algo_function
         self.path_docker = path_docker
-        self.k_value = k_value
+        self.k_value = None
         self.path_docker_default = "/hyperParametersTuning/"
         self.job_name = job_name
         self.graphs_path = graphs_path
@@ -32,6 +31,8 @@ class PywrenHyperParameterUtil(object):
         :param mew_k_value: new k value to preform k fold cross validation
         :return: nothing
         """
+        if mew_k_value <= 1:
+            raise Exception("K fold cross validation value should be 2 minimum")
         self.k_value = mew_k_value
 
     def set_parameters(self, parameters_list: list):
@@ -51,6 +52,8 @@ class PywrenHyperParameterUtil(object):
             Results list of evaluation of all set of parameters
             Duration the time spent to pywren for execution
         """
+        if self.k_value is None:
+            raise Exception("Please call to set k value method and try again")
         self.runtime = runtime
         start = time()
         pw = pywren.ibm_cf_executor(runtime=self.runtime)
@@ -101,13 +104,10 @@ class PywrenHyperParameterUtil(object):
         avg_recall /= len(results)
         return {"precision": avg_precision, "recall": avg_recall}
 
-    def __map_evaluate_parameters(self, lr, lrUpdateRate, ws, epoch, ibm_cos):
-        # workaround should get one dict and not knows the parameters
-
-        parameters_dict = {"lr": lr, "lrUpdateRate": lrUpdateRate, "ws": ws, "epoch": epoch}
+    def __map_evaluate_parameters(self, parameters_dict, ibm_cos):
         k_list = [i for i in range(self.k_value)]
 
-        def __k_fold_cross_validtion_wrap(valid_index, ibm_cos):
+        def __k_fold_cross_validation_wrap(valid_index, ibm_cos):
             file = ibm_cos.get_object(Bucket=self.bucket_name, Key=self.file_key)
             data_stream = file['Body']
             return self.__map_k_fold_cross_validation(data_stream, parameters_dict, valid_index)
@@ -116,5 +116,5 @@ class PywrenHyperParameterUtil(object):
             return self.__reducer_average_validator(results)
 
         sub_pw = pywren.ibm_cf_executor(runtime=self.runtime)
-        sub_pw.map_reduce(__k_fold_cross_validtion_wrap, k_list, __reducer_average_validator_wrap, reducer_wait_local=False)
+        sub_pw.map_reduce(__k_fold_cross_validation_wrap, k_list, __reducer_average_validator_wrap, reducer_wait_local=False)
         return sub_pw.get_result()

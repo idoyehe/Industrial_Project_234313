@@ -53,7 +53,7 @@ for index in range(repeats):
                                                files_to_predict[current_index],
                                                reduce_function,
                                                chunk_size,
-                                               runtime="fasttext-exists-models")
+                                               runtime="fasttext-classification")
     total_duration += executor.get_last_duration()
 
 print("\nAVG Duration: " + str(total_duration / float(repeats)) + " Sec")

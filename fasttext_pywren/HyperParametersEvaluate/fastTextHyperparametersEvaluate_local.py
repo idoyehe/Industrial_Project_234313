@@ -7,9 +7,33 @@ files_names = {"dbpedia": ("../Models/dbpedia", "dbpedia.train"),
 
 """example"""
 iter_parameters = \
-    [{'lr': 0.3, 'lrUpdateRate': 80, 'ws': 6, 'epoch': 5}]
+    [[{'lr': 1, 'lrUpdateRate': 20, 'ws': 6, 'epoch': 12}], [{'lr': 0.6, 'lrUpdateRate': 70, 'ws': 7, 'epoch': 9}],
+     [{'lr': 0.5, 'lrUpdateRate': 70, 'ws': 7, 'epoch': 13}], [{'lr': 0.1, 'lrUpdateRate': 100, 'ws': 7, 'epoch': 13}],
+     [{'lr': 0.9, 'lrUpdateRate': 70, 'ws': 5, 'epoch': 15}], [{'lr': 0.7, 'lrUpdateRate': 20, 'ws': 4, 'epoch': 13}],
+     [{'lr': 0.9, 'lrUpdateRate': 20, 'ws': 6, 'epoch': 8}], [{'lr': 0.3, 'lrUpdateRate': 30, 'ws': 7, 'epoch': 7}],
+     [{'lr': 0.2, 'lrUpdateRate': 40, 'ws': 3, 'epoch': 13}], [{'lr': 0.3, 'lrUpdateRate': 40, 'ws': 5, 'epoch': 11}],
+     [{'lr': 0.1, 'lrUpdateRate': 20, 'ws': 3, 'epoch': 15}], [{'lr': 0.8, 'lrUpdateRate': 30, 'ws': 7, 'epoch': 6}],
+     [{'lr': 0.5, 'lrUpdateRate': 70, 'ws': 5, 'epoch': 10}], [{'lr': 1, 'lrUpdateRate': 100, 'ws': 5, 'epoch': 12}],
+     [{'lr': 0.5, 'lrUpdateRate': 90, 'ws': 3, 'epoch': 12}], [{'lr': 0.6, 'lrUpdateRate': 80, 'ws': 3, 'epoch': 9}],
+     [{'lr': 0.6, 'lrUpdateRate': 100, 'ws': 3, 'epoch': 15}], [{'lr': 0.2, 'lrUpdateRate': 100, 'ws': 7, 'epoch': 11}],
+     [{'lr': 0.3, 'lrUpdateRate': 40, 'ws': 6, 'epoch': 5}], [{'lr': 0.9, 'lrUpdateRate': 20, 'ws': 3, 'epoch': 10}],
+     [{'lr': 1, 'lrUpdateRate': 70, 'ws': 3, 'epoch': 13}], [{'lr': 0.2, 'lrUpdateRate': 30, 'ws': 7, 'epoch': 12}],
+     [{'lr': 1, 'lrUpdateRate': 70, 'ws': 5, 'epoch': 15}], [{'lr': 1, 'lrUpdateRate': 90, 'ws': 5, 'epoch': 12}],
+     [{'lr': 0.7, 'lrUpdateRate': 50, 'ws': 3, 'epoch': 8}], [{'lr': 0.6, 'lrUpdateRate': 30, 'ws': 6, 'epoch': 10}],
+     [{'lr': 0.4, 'lrUpdateRate': 40, 'ws': 7, 'epoch': 15}], [{'lr': 0.5, 'lrUpdateRate': 30, 'ws': 3, 'epoch': 11}],
+     [{'lr': 0.5, 'lrUpdateRate': 40, 'ws': 7, 'epoch': 15}], [{'lr': 0.5, 'lrUpdateRate': 70, 'ws': 5, 'epoch': 7}],
+     [{'lr': 0.5, 'lrUpdateRate': 60, 'ws': 3, 'epoch': 14}], [{'lr': 0.7, 'lrUpdateRate': 70, 'ws': 5, 'epoch': 15}],
+     [{'lr': 0.5, 'lrUpdateRate': 90, 'ws': 3, 'epoch': 13}], [{'lr': 0.4, 'lrUpdateRate': 80, 'ws': 6, 'epoch': 6}],
+     [{'lr': 0.7, 'lrUpdateRate': 70, 'ws': 4, 'epoch': 13}], [{'lr': 0.6, 'lrUpdateRate': 40, 'ws': 6, 'epoch': 12}],
+     [{'lr': 1, 'lrUpdateRate': 70, 'ws': 3, 'epoch': 14}], [{'lr': 0.2, 'lrUpdateRate': 50, 'ws': 6, 'epoch': 5}],
+     [{'lr': 1, 'lrUpdateRate': 90, 'ws': 7, 'epoch': 13}], [{'lr': 1, 'lrUpdateRate': 70, 'ws': 3, 'epoch': 7}],
+     [{'lr': 0.2, 'lrUpdateRate': 20, 'ws': 7, 'epoch': 9}], [{'lr': 0.3, 'lrUpdateRate': 100, 'ws': 5, 'epoch': 7}],
+     [{'lr': 0.8, 'lrUpdateRate': 90, 'ws': 7, 'epoch': 10}], [{'lr': 0.2, 'lrUpdateRate': 20, 'ws': 4, 'epoch': 11}],
+     [{'lr': 1, 'lrUpdateRate': 50, 'ws': 7, 'epoch': 5}], [{'lr': 0.5, 'lrUpdateRate': 40, 'ws': 4, 'epoch': 9}],
+     [{'lr': 0.9, 'lrUpdateRate': 80, 'ws': 7, 'epoch': 9}], [{'lr': 0.4, 'lrUpdateRate': 40, 'ws': 4, 'epoch': 14}],
+     [{'lr': 0.2, 'lrUpdateRate': 60, 'ws': 4, 'epoch': 15}], [{'lr': 0.9, 'lrUpdateRate': 40, 'ws': 7, 'epoch': 14}]]
 
-K = 1
+K = 3
 
 def fastText_evaluate(parameters_dict, train_path, test_path):
     to_valid_model = fstTxt.train_supervised(train_path, **parameters_dict)
@@ -63,10 +87,11 @@ total_results = {"Results": list(), "Duration": None}
 for i in range(3):
     start = time()
     for current_params in iter_parameters:
+        current_params = current_params[0]
         results = list()
         for index in range(K):
             results.append(
-                map_k_fold_cross_validation(files_names["yelp"][0], files_names["yelp"][1], current_params, K, index))
+                map_k_fold_cross_validation(files_names["dbpedia"][0], files_names["dbpedia"][1], current_params, K, index))
         total_results["Results"].append(reducer_average_validator(results))
     total_results["Duration"] = time() - start
 
