@@ -91,18 +91,27 @@ class PywrenHyperParameterUtil(object):
         valid_file.close()
         train_file.close()
 
-        return self.evalute_learning_algo_function(params_dict, train_path, valid_path)
+        start = time()
+        evaluation_res = self.evalute_learning_algo_function(params_dict, train_path, valid_path)
+        end = time()
+        evaluation_res["trainDuration"] = end - start
+
+        return evaluation_res
+
 
     def __reducer_average_validator(self, results):
         avg_precision = 0
         avg_recall = 0
+        avg_train_duration = 0
         for res in results:
             avg_precision += res["precision"]
             avg_recall += res["recall"]
+            avg_train_duration += res["trainDuration"]
 
         avg_precision /= len(results)
         avg_recall /= len(results)
-        return {"precision": avg_precision, "recall": avg_recall}
+        avg_train_duration /= len(results)
+        return {"precision": avg_precision, "recall": avg_recall, "trainDuration": avg_train_duration}
 
     def __map_evaluate_parameters(self, parameters_dict, ibm_cos):
         k_list = [i for i in range(self.k_value)]
