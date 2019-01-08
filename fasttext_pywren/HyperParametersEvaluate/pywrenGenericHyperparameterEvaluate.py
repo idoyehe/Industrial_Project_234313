@@ -24,6 +24,8 @@ class PywrenHyperParameterUtil(object):
         self.job_name = job_name
         self.graphs_path = graphs_path
         self.parameters_list = None
+        self.eval_keys = None
+        self.train_duration_label = "trainDuration"
         self.runtime = None
 
     def set_kvalue(self, mew_k_value: int):
@@ -34,6 +36,15 @@ class PywrenHyperParameterUtil(object):
         if mew_k_value <= 1:
             raise Exception("K fold cross validation value should be 2 minimum")
         self.k_value = mew_k_value
+
+    def set_evaluation_keys(self, eval_keys: list):
+        """
+        :param eval_keys: a list of keys (strings) of the dictionary that return from the learning algorithm function
+        :return: nothing
+        """
+        if eval_keys is None or len(eval_keys) < 1:
+            raise Exception("Please provide evaluation keys list with length minimum 1")
+        self.eval_keys = eval_keys + [self.train_duration_label]
 
     def set_parameters(self, parameters_list: list):
         """
@@ -50,10 +61,14 @@ class PywrenHyperParameterUtil(object):
         :param runtime: thr action in cloud to invoke
         :return: a dict that has 2 keys:
             Results list of evaluation of all set of parameters
-            Duration the time spent to pywren for execution
+            Duration the time takes to PyWren for execution
         """
         if self.k_value is None:
             raise Exception("Please call to set k value method and try again")
+
+        if self.eval_keys is None:
+            raise Exception("Please call to set evaluation keys method and try again")
+
         self.runtime = runtime
         start = time()
         pw = pywren.ibm_cf_executor(runtime=self.runtime)
@@ -63,7 +78,7 @@ class PywrenHyperParameterUtil(object):
         self.runtime = None
         if self.job_name and self.graphs_path:
             pw.create_timeline_plots(dst=self.graphs_path, name=self.job_name)
-        return {"Results": pw_res, "Duration": duration}
+        return {"Results": pw_res, "TotalDuration": duration}
 
     def __map_k_fold_cross_validation(self, data_stream, params_dict, valid_index):
         if self.path_docker is None:
@@ -94,24 +109,22 @@ class PywrenHyperParameterUtil(object):
         start = time()
         evaluation_res = self.evalute_learning_algo_function(params_dict, train_path, valid_path)
         end = time()
-        evaluation_res["trainDuration"] = end - start
+        evaluation_res[self.train_duration_label] = end - start
 
         return evaluation_res
 
-
     def __reducer_average_validator(self, results):
-        avg_precision = 0
-        avg_recall = 0
-        avg_train_duration = 0
-        for res in results:
-            avg_precision += res["precision"]
-            avg_recall += res["recall"]
-            avg_train_duration += res["trainDuration"]
+        k_cross_valid_dict = {}
+        for key in self.eval_keys:  # initialize all sums to 0
+            k_cross_valid_dict[key] = 0
 
-        avg_precision /= len(results)
-        avg_recall /= len(results)
-        avg_train_duration /= len(results)
-        return {"precision": avg_precision, "recall": avg_recall, "trainDuration": avg_train_duration}
+        for res in results:
+            for key in self.eval_keys:  # adding to all sums
+                k_cross_valid_dict[key] += res[key]
+
+        for key in self.eval_keys:  # average each sum
+            k_cross_valid_dict[key] /= len(results)
+        return k_cross_valid_dict
 
     def __map_evaluate_parameters(self, parameters_dict, ibm_cos):
         k_list = [i for i in range(self.k_value)]
