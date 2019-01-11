@@ -1,6 +1,5 @@
 from random import random
 from ExecuterWrapper.executorWrapper import ExecutorWrap, Location
-import pywren_ibm_cloud as pywren
 
 exe_location = Location.PYWREN
 
@@ -22,7 +21,7 @@ class EstimatePI:
         y = random()
         return (x ** 2) + (y ** 2) <= 1
 
-    def randomize_points(self, iter):
+    def randomize_points(self, data):
         in_circle = 0
         for _ in range(self.randomize_per_map):
             in_circle += self.predicate()
