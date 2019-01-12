@@ -1,0 +1,14 @@
+{
+  "ibm_cf": {
+    "endpoint": "https://us-east.functions.cloud.ibm.com",
+    "namespace": "idoye@campus.technion.ac.il_dev",
+    "api_key": "dcc7a4ba-ea69-4402-8dde-8b9d080cdfd1:G2UHfMM9J3fjylo3MtihcaLDGXxrI8DkOarEJaESP64t19sPlRBi4UoVn6gZgyGw"
+  },
+  "ibm_cos": {
+    "endpoint": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
+    "api_key": "Pf_5-pO9PxedTJe264EpNAzpEBppQMIH6BPUb-YjjOsJ"
+  },
+  "pywren": {
+    "storage_bucket": "project-pywren-bucket"
+  }
+}
