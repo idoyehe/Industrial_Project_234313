@@ -1,14 +1,15 @@
 from random import choice
+import numpy as np
 
 list_size = 50
 
-lr_values = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+lr_values = np.arange(0.1, 1.1, 0.1)
 
-lrUpdateRate_values = [20, 30, 40, 50, 60, 70, 80, 90, 100]
+lrUpdateRate_values = np.arange(20, 110, 10)
 
-ws_values = [3, 4, 5, 6, 7]
+ws_values = np.arange(3, 8, 1)
 
-epoch_values = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+epoch_values = np.arange(5, 16, 1)
 
 iter_hyperparameters = list()
 for i in range(list_size):
