@@ -1,5 +1,5 @@
 import fastText as fstTxt
-from fasttext_pywren.HyperParametersEvaluate.localK_fold_cross_validation import *
+from fasttext_pywren.HyperParametersEvaluate.localGenericHyperparameterEvaluate import *
 
 models_names = {"dbpedia": "../Models/dbpedia/dbpedia.train",
                 "yelp": "../Models/yelp_review_full/yelp_review_full.train"}
