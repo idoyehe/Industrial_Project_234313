@@ -26,7 +26,7 @@ class LocalKFoldCrossValidation(object):
         self.evaluate_function = evaluate_function
         self.evaluate_keys = evaluate_keys
 
-        self.folders_prefix = "./validation_"
+        self.folders_prefix = "./fold_"
         self.train_file_name = "database.train"
         self.test_file_name = "database.test"
 
@@ -58,14 +58,14 @@ class LocalKFoldCrossValidation(object):
 
     def __reducer_average_validator(self, results):
         k_cross_valid_dict = {}
-        for key in self.eval_keys:  # initialize all sums to 0
+        for key in self.evaluate_keys:  # initialize all sums to 0
             k_cross_valid_dict[key] = 0
 
         for res in results:
-            for key in self.eval_keys:  # adding to all sums
+            for key in self.evaluate_keys:  # adding to all sums
                 k_cross_valid_dict[key] += res[key]
 
-        for key in self.eval_keys:  # average each sum
+        for key in self.evaluate_keys:  # average each sum
             k_cross_valid_dict[key] /= len(results)
         return k_cross_valid_dict
 
@@ -83,6 +83,6 @@ class LocalKFoldCrossValidation(object):
         p = Pool(self.k_value)
         results = p.starmap(func=self.evaluate_function, iterable=args_list)
         results = self.__reducer_average_validator(results)
-        results['time'] = time() - start_time
+        results['completion_time'] = time() - start_time
         self.__cleaner()  # make sure last session cleaned
         return results
