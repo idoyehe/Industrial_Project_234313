@@ -8,35 +8,37 @@ bucketname = 'fasttext-train-datasets'
 
 """example"""
 iter_parameters = \
-    [[{'lr': 0.9, 'lrUpdateRate': 40, 'ws': 6, 'epoch': 7}], [{'lr': 0.6, 'lrUpdateRate': 80, 'ws': 4, 'epoch': 5}],
-     [{'lr': 0.6, 'lrUpdateRate': 30, 'ws': 7, 'epoch': 13}], [{'lr': 0.9, 'lrUpdateRate': 60, 'ws': 3, 'epoch': 13}],
-     [{'lr': 1, 'lrUpdateRate': 70, 'ws': 7, 'epoch': 5}], [{'lr': 0.9, 'lrUpdateRate': 30, 'ws': 4, 'epoch': 6}],
-     [{'lr': 0.5, 'lrUpdateRate': 80, 'ws': 5, 'epoch': 7}], [{'lr': 1, 'lrUpdateRate': 80, 'ws': 7, 'epoch': 7}],
-     [{'lr': 0.3, 'lrUpdateRate': 60, 'ws': 5, 'epoch': 5}], [{'lr': 0.7, 'lrUpdateRate': 40, 'ws': 6, 'epoch': 11}],
-     [{'lr': 0.1, 'lrUpdateRate': 100, 'ws': 6, 'epoch': 12}], [{'lr': 0.9, 'lrUpdateRate': 40, 'ws': 4, 'epoch': 7}],
-     [{'lr': 0.6, 'lrUpdateRate': 40, 'ws': 7, 'epoch': 6}], [{'lr': 0.1, 'lrUpdateRate': 100, 'ws': 3, 'epoch': 8}],
-     [{'lr': 0.7, 'lrUpdateRate': 40, 'ws': 4, 'epoch': 9}], [{'lr': 1, 'lrUpdateRate': 100, 'ws': 7, 'epoch': 7}],
-     [{'lr': 0.7, 'lrUpdateRate': 50, 'ws': 5, 'epoch': 5}], [{'lr': 0.6, 'lrUpdateRate': 60, 'ws': 7, 'epoch': 8}],
-     [{'lr': 0.3, 'lrUpdateRate': 80, 'ws': 3, 'epoch': 9}], [{'lr': 0.7, 'lrUpdateRate': 50, 'ws': 6, 'epoch': 6}],
-     [{'lr': 0.8, 'lrUpdateRate': 30, 'ws': 5, 'epoch': 13}], [{'lr': 1, 'lrUpdateRate': 60, 'ws': 6, 'epoch': 13}],
-     [{'lr': 0.8, 'lrUpdateRate': 100, 'ws': 7, 'epoch': 9}], [{'lr': 0.9, 'lrUpdateRate': 30, 'ws': 7, 'epoch': 11}],
-     [{'lr': 0.6, 'lrUpdateRate': 60, 'ws': 4, 'epoch': 10}], [{'lr': 0.3, 'lrUpdateRate': 50, 'ws': 6, 'epoch': 5}],
-     [{'lr': 0.3, 'lrUpdateRate': 90, 'ws': 7, 'epoch': 9}], [{'lr': 1, 'lrUpdateRate': 60, 'ws': 6, 'epoch': 5}],
-     [{'lr': 0.8, 'lrUpdateRate': 80, 'ws': 4, 'epoch': 13}], [{'lr': 0.4, 'lrUpdateRate': 100, 'ws': 6, 'epoch': 13}],
-     [{'lr': 0.7, 'lrUpdateRate': 40, 'ws': 5, 'epoch': 5}], [{'lr': 0.6, 'lrUpdateRate': 100, 'ws': 5, 'epoch': 8}],
-     [{'lr': 0.6, 'lrUpdateRate': 60, 'ws': 5, 'epoch': 9}], [{'lr': 0.7, 'lrUpdateRate': 80, 'ws': 6, 'epoch': 12}],
-     [{'lr': 0.2, 'lrUpdateRate': 100, 'ws': 7, 'epoch': 9}], [{'lr': 0.9, 'lrUpdateRate': 80, 'ws': 3, 'epoch': 13}],
-     [{'lr': 0.7, 'lrUpdateRate': 60, 'ws': 5, 'epoch': 8}], [{'lr': 0.4, 'lrUpdateRate': 60, 'ws': 3, 'epoch': 10}],
-     [{'lr': 0.7, 'lrUpdateRate': 60, 'ws': 7, 'epoch': 15}], [{'lr': 1, 'lrUpdateRate': 50, 'ws': 6, 'epoch': 9}],
-     [{'lr': 0.3, 'lrUpdateRate': 100, 'ws': 7, 'epoch': 11}], [{'lr': 0.6, 'lrUpdateRate': 20, 'ws': 7, 'epoch': 7}],
-     [{'lr': 0.1, 'lrUpdateRate': 80, 'ws': 4, 'epoch': 12}], [{'lr': 1, 'lrUpdateRate': 60, 'ws': 7, 'epoch': 14}],
-     [{'lr': 0.9, 'lrUpdateRate': 80, 'ws': 6, 'epoch': 8}], [{'lr': 0.4, 'lrUpdateRate': 70, 'ws': 3, 'epoch': 12}],
-     [{'lr': 0.4, 'lrUpdateRate': 40, 'ws': 5, 'epoch': 12}], [{'lr': 0.5, 'lrUpdateRate': 80, 'ws': 3, 'epoch': 7}],
-     [{'lr': 0.3, 'lrUpdateRate': 20, 'ws': 4, 'epoch': 12}], [{'lr': 0.4, 'lrUpdateRate': 40, 'ws': 4, 'epoch': 15}]]
+    [[{'lr': 0.7000000000000001, 'lrUpdateRate': 90, 'ws': 4, 'epoch': 7}], [{'lr': 0.5, 'lrUpdateRate': 100, 'ws': 5, 'epoch': 14}],
+     [{'lr': 0.4, 'lrUpdateRate': 70, 'ws': 5, 'epoch': 8}], [{'lr': 0.5, 'lrUpdateRate': 30, 'ws': 6, 'epoch': 13}],
+     [{'lr': 0.9, 'lrUpdateRate': 40, 'ws': 6, 'epoch': 5}], [{'lr': 0.1, 'lrUpdateRate': 50, 'ws': 7, 'epoch': 13}],
+     [{'lr': 0.5, 'lrUpdateRate': 70, 'ws': 7, 'epoch': 10}], [{'lr': 0.7000000000000001, 'lrUpdateRate': 80, 'ws': 5, 'epoch': 14}],
+     [{'lr': 0.4, 'lrUpdateRate': 40, 'ws': 3, 'epoch': 11}], [{'lr': 0.30000000000000004, 'lrUpdateRate': 20, 'ws': 6, 'epoch': 6}],
+     [{'lr': 0.4, 'lrUpdateRate': 40, 'ws': 7, 'epoch': 12}], [{'lr': 0.4, 'lrUpdateRate': 100, 'ws': 3, 'epoch': 10}],
+     [{'lr': 0.2, 'lrUpdateRate': 50, 'ws': 6, 'epoch': 8}], [{'lr': 0.1, 'lrUpdateRate': 20, 'ws': 3, 'epoch': 11}],
+     [{'lr': 0.4, 'lrUpdateRate': 50, 'ws': 7, 'epoch': 14}], [{'lr': 0.1, 'lrUpdateRate': 40, 'ws': 6, 'epoch': 5}],
+     [{'lr': 0.30000000000000004, 'lrUpdateRate': 80, 'ws': 7, 'epoch': 11}], [{'lr': 0.2, 'lrUpdateRate': 100, 'ws': 7, 'epoch': 11}],
+     [{'lr': 1.0, 'lrUpdateRate': 60, 'ws': 7, 'epoch': 5}], [{'lr': 0.8, 'lrUpdateRate': 70, 'ws': 5, 'epoch': 14}],
+     [{'lr': 0.8, 'lrUpdateRate': 30, 'ws': 5, 'epoch': 10}], [{'lr': 0.4, 'lrUpdateRate': 80, 'ws': 5, 'epoch': 5}],
+     [{'lr': 0.2, 'lrUpdateRate': 60, 'ws': 4, 'epoch': 14}], [{'lr': 0.9, 'lrUpdateRate': 60, 'ws': 4, 'epoch': 11}],
+     [{'lr': 0.9, 'lrUpdateRate': 80, 'ws': 5, 'epoch': 15}], [{'lr': 0.7000000000000001, 'lrUpdateRate': 50, 'ws': 7, 'epoch': 11}],
+     [{'lr': 0.2, 'lrUpdateRate': 20, 'ws': 7, 'epoch': 9}], [{'lr': 0.5, 'lrUpdateRate': 20, 'ws': 4, 'epoch': 5}],
+     [{'lr': 0.6, 'lrUpdateRate': 90, 'ws': 6, 'epoch': 9}], [{'lr': 0.1, 'lrUpdateRate': 30, 'ws': 4, 'epoch': 12}],
+     [{'lr': 0.1, 'lrUpdateRate': 40, 'ws': 7, 'epoch': 9}], [{'lr': 0.6, 'lrUpdateRate': 90, 'ws': 3, 'epoch': 8}],
+     [{'lr': 0.5, 'lrUpdateRate': 80, 'ws': 6, 'epoch': 15}], [{'lr': 0.7000000000000001, 'lrUpdateRate': 40, 'ws': 5, 'epoch': 12}],
+     [{'lr': 0.9, 'lrUpdateRate': 60, 'ws': 7, 'epoch': 12}], [{'lr': 0.1, 'lrUpdateRate': 100, 'ws': 5, 'epoch': 7}],
+     [{'lr': 1.0, 'lrUpdateRate': 60, 'ws': 7, 'epoch': 10}], [{'lr': 0.4, 'lrUpdateRate': 100, 'ws': 4, 'epoch': 12}],
+     [{'lr': 0.2, 'lrUpdateRate': 60, 'ws': 4, 'epoch': 9}], [{'lr': 0.30000000000000004, 'lrUpdateRate': 80, 'ws': 5, 'epoch': 8}],
+     [{'lr': 1.0, 'lrUpdateRate': 90, 'ws': 3, 'epoch': 6}], [{'lr': 0.7000000000000001, 'lrUpdateRate': 20, 'ws': 5, 'epoch': 12}],
+     [{'lr': 0.4, 'lrUpdateRate': 50, 'ws': 7, 'epoch': 7}], [{'lr': 0.30000000000000004, 'lrUpdateRate': 60, 'ws': 7, 'epoch': 7}],
+     [{'lr': 1.0, 'lrUpdateRate': 20, 'ws': 3, 'epoch': 12}], [{'lr': 0.5, 'lrUpdateRate': 80, 'ws': 6, 'epoch': 6}],
+     [{'lr': 0.9, 'lrUpdateRate': 60, 'ws': 7, 'epoch': 5}], [{'lr': 0.5, 'lrUpdateRate': 30, 'ws': 7, 'epoch': 5}],
+     [{'lr': 0.9, 'lrUpdateRate': 100, 'ws': 7, 'epoch': 8}], [{'lr': 1.0, 'lrUpdateRate': 70, 'ws': 7, 'epoch': 10}]]
 
 K = 4
 
 """evaluation model function instance"""
+
+
 def fastText_evaluate(parameters_dict, train_path, test_path):
     to_valid_model = fstTxt.train_supervised(train_path, **parameters_dict)
     result = to_valid_model.test(test_path)
