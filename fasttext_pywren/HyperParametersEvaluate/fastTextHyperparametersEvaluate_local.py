@@ -12,5 +12,5 @@ def fastText_evaluate(train_path, test_path, hyperparameters_set):
 
 
 lkf = LocalKFoldCrossValidation(5, models_names['dbpedia'], ("precision", "recall"), fastText_evaluate)
-results = lkf.k_fold_cross_validation()
+results = lkf.hyperparameters_kfc()
 print(results)
