@@ -41,6 +41,7 @@ def _evaluate_single_hyperparameters(k_value,
                                      evaluate_function,
                                      evaluate_keys,
                                      hyperparameters_set={}):
+    start_time = time()
     args_list = []
     for eval_index in range(k_value):
         path: str = folders_prefix + str(eval_index) + "/"
@@ -51,6 +52,7 @@ def _evaluate_single_hyperparameters(k_value,
     p = multiprocessing.Pool(k_value)
     results = p.starmap(func=evaluate_function, iterable=args_list)
     results = _reducer_average_validator(evaluate_keys, results)
+    results['validation_completion_time'] = time() - start_time
     return results
 
 
@@ -82,7 +84,6 @@ class LocalKFoldCrossValidation(object):
                               self.train_file_name,
                               self.test_file_name,
                               path))
-
         p = multiprocessing.Pool(self.k_value)
         p.starmap(func=_createValidationFiles, iterable=args_list)
         opened_train_file.close()
@@ -91,7 +92,7 @@ class LocalKFoldCrossValidation(object):
         for i in range(self.k_value):
             rmtree(self.folders_prefix + str(i), ignore_errors=True)
 
-    def hyperparameters_kfc(self, hyperparameters_sets=[[{}],[{}]]):
+    def hyperparameters_kfc(self, hyperparameters_sets=[[{}]]):
         self.__cleaner()  # make sure last session cleaned
         start_time = time()
         self.__k_partitioner()
