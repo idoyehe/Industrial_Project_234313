@@ -4,6 +4,7 @@ from shutil import rmtree
 import billiard as multiprocessing
 from time import time
 
+
 def _createValidationFiles(_labeled_data: list, _train_index: list, _test_index: list, _train_file_name: str, _test_file_name: str,
                            _path: str):
     mkdir(_path)
@@ -90,7 +91,7 @@ class LocalKFoldCrossValidation(object):
         for i in range(self.k_value):
             rmtree(self.folders_prefix + str(i), ignore_errors=True)
 
-    def hyperparameters_kfc(self, hyperparameters_sets=[[{}]]):
+    def hyperparameters_kfc(self, hyperparameters_sets=[[{}],[{}]]):
         self.__cleaner()  # make sure last session cleaned
         start_time = time()
         self.__k_partitioner()
@@ -106,6 +107,6 @@ class LocalKFoldCrossValidation(object):
 
         p = multiprocessing.Pool(len(hyperparameters_sets))
         results = p.starmap(func=_evaluate_single_hyperparameters, iterable=args_list)
-        results['completion_time'] = time() - start_time
+        completion_time = time() - start_time
         self.__cleaner()  # make sure current session cleaned
-        return results
+        return {"results": results, "completion_time": completion_time}

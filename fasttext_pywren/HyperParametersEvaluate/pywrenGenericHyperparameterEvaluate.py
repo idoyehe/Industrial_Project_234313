@@ -1,31 +1,46 @@
 import pywren_ibm_cloud as pywren
 import types
-import os
+from os import mkdir, path
+from shutil import rmtree
+from sklearn.model_selection import KFold
 from time import time
 
 
+def files_checker():
+    return path.exists("/hyperParametersKFC/fold_0/database.train") and \
+           path.exists("/hyperParametersKFC/fold_0/database.test") and \
+           path.exists("/hyperParametersKFC/fold_1/database.train") and \
+           path.exists("/hyperParametersKFC/fold_1/database.test") and \
+           path.exists("/hyperParametersKFC/fold_2/database.train") and \
+           path.exists("/hyperParametersKFC/fold_2/database.test") and \
+           path.exists("/hyperParametersKFC/fold_3/database.train") and \
+           path.exists("/hyperParametersKFC/fold_3/database.test") and \
+           path.exists("/hyperParametersKFC/fold_4/database.train") and \
+           path.exists("/hyperParametersKFC/fold_4/database.test")
+
 class PywrenHyperParameterUtil(object):
     def __init__(self, evaluate_learning_algo_function: types.FunctionType, bucket_name: str, file_key: str,
-                 job_name: str = None, graphs_path: str = None, path_docker: str = None):
+                 job_name: str = None, graphs_path: str = None):
         """
         :param job_name: job name for invocation graphs
         :param evaluate_learning_algo_function: function to evaluate model with given parameters
             it signature should be  (parameters_dict, train_path, test_path) and return {"precision": precision, "recall": recall}
         :param bucket_name: the bucket name stores train file
         :param file_key: train file name as stores in bucket given bucket
-        :param path_docker: specific folder to save temporary files, can be none and will create while run time
         """
         self.file_key = file_key
         self.bucket_name = bucket_name
         self.evalute_learning_algo_function = evaluate_learning_algo_function
-        self.path_docker = path_docker
         self.k_value = None
-        self.path_docker_default = "/hyperParametersTuning/"
+        self.path_docker_default = "/hyperParametersKFC/"
+        self.folders_prefix = "fold_"
+        self.train_file_name = "database.train"
+        self.test_file_name = "database.test"
         self.job_name = job_name
         self.graphs_path = graphs_path
         self.parameters_list = None
         self.eval_keys = None
-        self.train_duration_label = "trainDuration"
+        self.validation_time_label = "validation_completion_time"
         self.runtime = None
 
     def set_kvalue(self, mew_k_value: int):
@@ -44,7 +59,7 @@ class PywrenHyperParameterUtil(object):
         """
         if eval_keys is None or len(eval_keys) < 1:
             raise Exception("Please provide evaluation keys list with length minimum 1")
-        self.eval_keys = eval_keys + [self.train_duration_label]
+        self.eval_keys = eval_keys + [self.validation_time_label]
 
     def set_parameters(self, parameters_list: list):
         """
@@ -55,6 +70,31 @@ class PywrenHyperParameterUtil(object):
             raise TypeError("parameters_list should be list object")
 
         self.parameters_list = parameters_list
+
+    def kfcv_partitioner(self, ibm_cos):
+        file = ibm_cos.get_object(Bucket=self.bucket_name, Key=self.file_key)
+        labeled_data = file['Body'].read().splitlines()
+        kf = KFold(n_splits=self.k_value, shuffle=True)
+        splits = kf.split(labeled_data)
+
+        rmtree(self.path_docker_default, ignore_errors=True)
+        mkdir(self.path_docker_default)
+
+        i: int = 0
+        for train_index, test_index in splits:
+            folder_path: str = self.path_docker_default + self.folders_prefix + str(i) + "/"
+            i += 1
+            mkdir(folder_path)
+            train_path = folder_path + self.train_file_name
+            test_path = folder_path + self.test_file_name
+            train_lines = [labeled_data[index].decode('utf-8') + "\n" for index in train_index]
+            test_lines = [labeled_data[index].decode('utf-8') + "\n" for index in test_index]
+            train_file = open(train_path, 'w')
+            test_file = open(test_path, 'w')
+            train_file.writelines(train_lines)
+            test_file.writelines(test_lines)
+            test_file.close()
+            train_file.close()
 
     def evaluate_params(self, runtime="pywren_3.6"):
         """
@@ -72,44 +112,23 @@ class PywrenHyperParameterUtil(object):
         self.runtime = runtime
         start = time()
         pw = pywren.ibm_cf_executor(runtime=self.runtime)
+        pw.call_async(self.kfcv_partitioner, [])
+        pw.get_result()
+
+        pw = pywren.ibm_cf_executor(runtime=self.runtime)
         pw.map(self.__map_evaluate_parameters, self.parameters_list)
         pw_res = pw.get_result()
-        duration = time() - start
-        self.runtime = None
-        if self.job_name and self.graphs_path:
-            pw.create_timeline_plots(dst=self.graphs_path, name=self.job_name)
-        return {"Results": pw_res, "TotalDuration": duration}
+        completion_time = time() - start
+        return {"Results": pw_res, "total_completion_time": completion_time}
 
-    def __map_k_fold_cross_validation(self, data_stream, params_dict, valid_index):
-        if self.path_docker is None:
-            if os.path.exists(self.path_docker_default) is False:
-                os.mkdir(self.path_docker_default)
-            self.path_docker = self.path_docker_default
+    def __map_k_fold_cross_validation(self, params_dict, index):
 
-        valid_path = self.path_docker + "source.valid"
-        train_path = self.path_docker + "source.train"
-
-        train_file = open(train_path, 'w')
-        valid_file = open(valid_path, 'w')
-
-        current_index = 0
-        for line in data_stream.read().splitlines():
-            str_line = line.decode('utf-8')  # data comes from COS
-            str_line += "\n"
-            if current_index % self.k_value == valid_index:
-                valid_file.write(str_line)
-            else:
-                train_file.write(str_line)
-
-            current_index += 1
-
-        valid_file.close()
-        train_file.close()
+        train_file: str = self.path_docker_default + self.folders_prefix + str(index) + "/" + self.train_file_name
+        test_file: str = self.path_docker_default + self.folders_prefix + str(index) + "/" + self.test_file_name
 
         start = time()
-        evaluation_res = self.evalute_learning_algo_function(params_dict, train_path, valid_path)
-        end = time()
-        evaluation_res[self.train_duration_label] = end - start
+        evaluation_res = self.evalute_learning_algo_function(train_file, test_file, params_dict)
+        evaluation_res[self.validation_time_label] = time() - start
 
         return evaluation_res
 
@@ -126,17 +145,16 @@ class PywrenHyperParameterUtil(object):
             k_cross_valid_dict[key] /= len(results)
         return k_cross_valid_dict
 
-    def __map_evaluate_parameters(self, parameters_dict, ibm_cos):
+    def __map_evaluate_parameters(self, parameters_dict):
         k_list = [i for i in range(self.k_value)]
 
-        def __k_fold_cross_validation_wrap(valid_index, ibm_cos):
-            file = ibm_cos.get_object(Bucket=self.bucket_name, Key=self.file_key)
-            data_stream = file['Body']
-            return self.__map_k_fold_cross_validation(data_stream, parameters_dict, valid_index)
+        def __k_fold_cross_validation_wrap(valid_index):
+            return self.__map_k_fold_cross_validation(parameters_dict, valid_index)
 
         def __reducer_average_validator_wrap(results):
             return self.__reducer_average_validator(results)
 
-        sub_pw = pywren.ibm_cf_executor(runtime=self.runtime)
-        sub_pw.map_reduce(__k_fold_cross_validation_wrap, k_list, __reducer_average_validator_wrap, reducer_wait_local=False)
-        return sub_pw.get_result()
+        # sub_pw = pywren.ibm_cf_executor(runtime=self.runtime)
+        # sub_pw.map_reduce(__k_fold_cross_validation_wrap, k_list, __reducer_average_validator_wrap, reducer_wait_local=False)
+        # sub_pw.call_async(files_checker, [])
+        return files_checker()
