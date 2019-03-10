@@ -14,17 +14,49 @@ def fastText_evaluate(train_path, test_path, hyperparameters_set):
 
 """experiments 1"""
 if __name__ == '__main__':
+    # results = []
+    # for i in range(10):
+    #    lkf = LocalKFoldCrossValidation(5, models_names['dbpedia'], ("precision", "recall"), fastText_evaluate)
+    #    results.append(lkf.hyperparameters_kfc_parallel())
+    #
+    # parsed_results = []
+    # for inner_res in results:
+    #    completion_time = {"completion_time": inner_res["completion_time"]}
+    #    parsed_results.append({**inner_res["results"][0], **completion_time})
+    #
+    # f = open("./marc_experiments/exp_1_dbpedia_parallel.csv", 'w')
+    # writer = csv.DictWriter(f, fieldnames=["precision", "recall", "validation_completion_time","completion_time"])
+    # writer.writeheader()
+    # writer.writerows(parsed_results)
+    # f.close()
+    #
+    # results = []
+    # for i in range(10):
+    #     lkf = LocalKFoldCrossValidation(5, models_names['yelp'], ("precision", "recall"), fastText_evaluate)
+    #     results.append(lkf.hyperparameters_kfc_parallel())
+    #
+    # parsed_results = []
+    # for inner_res in results:
+    #     completion_time = {"completion_time": inner_res["completion_time"]}
+    #     parsed_results.append({**inner_res["results"][0], **completion_time})
+    #
+    # f = open("./marc_experiments/exp_1_yelp_parallel.csv", 'a')
+    # writer = csv.DictWriter(f, fieldnames=["precision", "recall", "validation_completion_time","completion_time"])
+    # writer.writeheader()
+    # writer.writerows(parsed_results)
+    # f.close()
+
     results = []
     for i in range(10):
        lkf = LocalKFoldCrossValidation(5, models_names['dbpedia'], ("precision", "recall"), fastText_evaluate)
-       results.append(lkf.hyperparameters_kfc())
+       results.append(lkf.hyperparameters_kfc_serial())
 
     parsed_results = []
     for inner_res in results:
        completion_time = {"completion_time": inner_res["completion_time"]}
        parsed_results.append({**inner_res["results"][0], **completion_time})
 
-    f = open("./marc_experiments/exp_1_dbpedia.csv", 'w')
+    f = open("./marc_experiments/exp_1_dbpedia_serial.csv", 'w')
     writer = csv.DictWriter(f, fieldnames=["precision", "recall", "validation_completion_time","completion_time"])
     writer.writeheader()
     writer.writerows(parsed_results)
@@ -33,14 +65,14 @@ if __name__ == '__main__':
     results = []
     for i in range(10):
         lkf = LocalKFoldCrossValidation(5, models_names['yelp'], ("precision", "recall"), fastText_evaluate)
-        results.append(lkf.hyperparameters_kfc())
+        results.append(lkf.hyperparameters_kfc_serial())
 
     parsed_results = []
     for inner_res in results:
         completion_time = {"completion_time": inner_res["completion_time"]}
         parsed_results.append({**inner_res["results"][0], **completion_time})
 
-    f = open("./marc_experiments/exp_1_yelp.csv", 'a')
+    f = open("./marc_experiments/exp_1_yelp_serial.csv", 'a')
     writer = csv.DictWriter(f, fieldnames=["precision", "recall", "validation_completion_time","completion_time"])
     writer.writeheader()
     writer.writerows(parsed_results)

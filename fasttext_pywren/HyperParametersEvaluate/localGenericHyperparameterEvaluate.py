@@ -34,13 +34,13 @@ def _reducer_average_validator(evaluate_keys, results):
     return k_cross_valid_dict
 
 
-def _evaluate_single_hyperparameters(k_value,
-                                     folders_prefix,
-                                     train_file_name,
-                                     test_file_name,
-                                     evaluate_function,
-                                     evaluate_keys,
-                                     hyperparameters_set={}):
+def _evaluate_single_hyperparameters_parallel(k_value,
+                                              folders_prefix,
+                                              train_file_name,
+                                              test_file_name,
+                                              evaluate_function,
+                                              evaluate_keys,
+                                              hyperparameters_set={}):
     start_time = time()
     args_list = []
     for eval_index in range(k_value):
@@ -67,7 +67,7 @@ class LocalKFoldCrossValidation(object):
         self.train_file_name = "database.train"
         self.test_file_name = "database.test"
 
-    def __k_partitioner(self):
+    def __k_partitioner_parallel(self):
         opened_train_file = open(self.train_file, 'r')
         labeled_data = opened_train_file.read().splitlines()
         kf = KFold(n_splits=self.k_value, shuffle=True)
@@ -92,10 +92,23 @@ class LocalKFoldCrossValidation(object):
         for i in range(self.k_value):
             rmtree(self.folders_prefix + str(i), ignore_errors=True)
 
-    def hyperparameters_kfc(self, hyperparameters_sets=[[{}]]):
+    def _evaluate_single_hyperparameters_serial(self, hyperparameters_set={}):
+        start_time = time()
+        results_list = []
+        for eval_index in range(self.k_value):
+            path: str = self.folders_prefix + str(eval_index) + "/"
+            train_path: str = path + self.train_file_name
+            test_path: str = path + self.test_file_name
+            results_list.append(self.evaluate_function(train_path, test_path, hyperparameters_set))
+
+        results = _reducer_average_validator(self.evaluate_keys, results_list)
+        results['validation_completion_time'] = time() - start_time
+        return results
+
+    def hyperparameters_kfc_parallel(self, hyperparameters_sets=[[{}]]):
         self.__cleaner()  # make sure last session cleaned
         start_time = time()
-        self.__k_partitioner()
+        self.__k_partitioner_parallel()
         args_list = []
         for hyp_set in hyperparameters_sets:
             args_list.append((self.k_value,
@@ -107,7 +120,35 @@ class LocalKFoldCrossValidation(object):
                               hyp_set[0]))
 
         p = multiprocessing.Pool(len(hyperparameters_sets))
-        results = p.starmap(func=_evaluate_single_hyperparameters, iterable=args_list)
+        results = p.starmap(func=_evaluate_single_hyperparameters_parallel, iterable=args_list)
+        completion_time = time() - start_time
+        self.__cleaner()  # make sure current session cleaned
+        return {"results": results, "completion_time": completion_time}
+
+    def hyperparameters_kfc_serial(self, hyperparameters_sets=[[{}]]):
+        self.__cleaner()  # make sure last session cleaned
+        start_time = time()
+        opened_train_file = open(self.train_file, 'r')
+        labeled_data = opened_train_file.read().splitlines()
+        kf = KFold(n_splits=self.k_value, shuffle=True)
+        splits = kf.split(labeled_data)
+
+        i = 0
+        for train_index, test_index in splits:
+            path: str = self.folders_prefix + str(i) + "/"
+            i += 1
+            _createValidationFiles(labeled_data,
+                                   train_index,
+                                   test_index,
+                                   self.train_file_name,
+                                   self.test_file_name,
+                                   path)
+
+        opened_train_file.close()
+
+        results = []
+        for hyp_set in hyperparameters_sets:
+            results.append(self._evaluate_single_hyperparameters_serial(hyp_set[0]))
         completion_time = time() - start_time
         self.__cleaner()  # make sure current session cleaned
         return {"results": results, "completion_time": completion_time}

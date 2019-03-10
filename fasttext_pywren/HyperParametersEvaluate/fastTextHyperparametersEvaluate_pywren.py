@@ -1,7 +1,8 @@
 import fastText as fstTxt
 from fasttext_pywren.HyperParametersEvaluate import pywrenGenericHyperparameterEvaluate
 
-files_names = {"dbpedia": "dbpedia.train",
+files_names = {"ag_news": "ag_news.train",
+               "dbpedia": "dbpedia.train",
                "yelp": "yelp_review_full.train"}
 
 bucketname = 'fasttext-train-datasets'
