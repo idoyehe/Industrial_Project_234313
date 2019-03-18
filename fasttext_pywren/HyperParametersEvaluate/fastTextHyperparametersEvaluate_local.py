@@ -13,34 +13,35 @@ def fastText_evaluate(train_path, test_path, hyperparameters_set):
 
 
 """experiments 1"""
-results = []
-for i in range(5):
-    lkf = LocalKFoldCrossValidation(5, models_names['dbpedia'], ("precision", "recall"), fastText_evaluate)
-    results.append(lkf.hyperparameters_kfc())
+if __name__ == '__main__':
+    results = []
+    for i in range(5):
+        lkf = LocalKFoldCrossValidation(5, models_names['dbpedia'], ("precision", "recall"), fastText_evaluate)
+        results.append(lkf.hyperparameters_kfc())
 
-parsed_results = []
-for inner_res in results:
-    completion_time = {"completion_time": inner_res["completion_time"]}
-    parsed_results.append({**inner_res["results"][0], **completion_time})
+    parsed_results = []
+    for inner_res in results:
+        completion_time = {"completion_time": inner_res["completion_time"]}
+        parsed_results.append({**inner_res["results"][0], **completion_time})
 
-f = open("./marc_experiments/exp_1_dbpedia.csv", 'w')
-writer = csv.DictWriter(f, fieldnames=["precision", "recall", "validation_completion_time","completion_time"])
-writer.writeheader()
-writer.writerows(parsed_results)
-f.close()
+    f = open("./marc_experiments/exp_1_dbpedia.csv", 'w')
+    writer = csv.DictWriter(f, fieldnames=["precision", "recall", "validation_completion_time","completion_time"])
+    writer.writeheader()
+    writer.writerows(parsed_results)
+    f.close()
 
-results = []
-for i in range(5):
-    lkf = LocalKFoldCrossValidation(5, models_names['yelp'], ("precision", "recall"), fastText_evaluate)
-    results.append(lkf.hyperparameters_kfc())
+    results = []
+    for i in range(5):
+        lkf = LocalKFoldCrossValidation(5, models_names['yelp'], ("precision", "recall"), fastText_evaluate)
+        results.append(lkf.hyperparameters_kfc())
 
-parsed_results = []
-for inner_res in results:
-    completion_time = {"completion_time": inner_res["completion_time"]}
-    parsed_results.append({**inner_res["results"][0], **completion_time})
+    parsed_results = []
+    for inner_res in results:
+        completion_time = {"completion_time": inner_res["completion_time"]}
+        parsed_results.append({**inner_res["results"][0], **completion_time})
 
-f = open("./marc_experiments/exp_1_yelp.csv", 'w')
-writer = csv.DictWriter(f, fieldnames=["precision", "recall", "validation_completion_time","completion_time"])
-writer.writeheader()
-writer.writerows(parsed_results)
-f.close()
+    f = open("./marc_experiments/exp_1_yelp.csv", 'w')
+    writer = csv.DictWriter(f, fieldnames=["precision", "recall", "validation_completion_time","completion_time"])
+    writer.writeheader()
+    writer.writerows(parsed_results)
+    f.close()
