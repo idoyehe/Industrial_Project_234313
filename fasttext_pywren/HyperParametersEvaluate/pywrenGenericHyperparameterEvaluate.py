@@ -6,18 +6,6 @@ from sklearn.model_selection import KFold
 from time import time
 
 
-def files_checker():
-    return path.exists("/hyperParametersKFC/fold_0/database.train") and \
-           path.exists("/hyperParametersKFC/fold_0/database.test") and \
-           path.exists("/hyperParametersKFC/fold_1/database.train") and \
-           path.exists("/hyperParametersKFC/fold_1/database.test") and \
-           path.exists("/hyperParametersKFC/fold_2/database.train") and \
-           path.exists("/hyperParametersKFC/fold_2/database.test") and \
-           path.exists("/hyperParametersKFC/fold_3/database.train") and \
-           path.exists("/hyperParametersKFC/fold_3/database.test") and \
-           path.exists("/hyperParametersKFC/fold_4/database.train") and \
-           path.exists("/hyperParametersKFC/fold_4/database.test")
-
 class PywrenHyperParameterUtil(object):
     def __init__(self, evaluate_learning_algo_function: types.FunctionType, bucket_name: str, file_key: str,
                  job_name: str = None, graphs_path: str = None):
@@ -77,24 +65,16 @@ class PywrenHyperParameterUtil(object):
         kf = KFold(n_splits=self.k_value, shuffle=True)
         splits = kf.split(labeled_data)
 
-        rmtree(self.path_docker_default, ignore_errors=True)
-        mkdir(self.path_docker_default)
-
         i: int = 0
         for train_index, test_index in splits:
-            folder_path: str = self.path_docker_default + self.folders_prefix + str(i) + "/"
+            train_name = "fold_" + str(i) + ".train"
+            test_name = "fold_" + str(i) + ".test"
             i += 1
-            mkdir(folder_path)
-            train_path = folder_path + self.train_file_name
-            test_path = folder_path + self.test_file_name
-            train_lines = [labeled_data[index].decode('utf-8') + "\n" for index in train_index]
-            test_lines = [labeled_data[index].decode('utf-8') + "\n" for index in test_index]
-            train_file = open(train_path, 'w')
-            test_file = open(test_path, 'w')
-            train_file.writelines(train_lines)
-            test_file.writelines(test_lines)
-            test_file.close()
-            train_file.close()
+            train_data = '\n'.join([labeled_data[index].decode('utf-8') for index in train_index])
+            test_data = '\n'.join([labeled_data[index].decode('utf-8') for index in test_index])
+            ibm_cos.put_object(Bucket=self.bucket_name, Key=train_name, Body=train_data)
+            ibm_cos.put_object(Bucket=self.bucket_name, Key=test_name, Body=test_data)
+        return
 
     def evaluate_params(self, runtime="pywren_3.6"):
         """
@@ -113,13 +93,13 @@ class PywrenHyperParameterUtil(object):
         start = time()
         pw = pywren.ibm_cf_executor(runtime=self.runtime)
         pw.call_async(self.kfcv_partitioner, [])
-        pw.get_result()
+        results = pw.get_result()
 
-        pw = pywren.ibm_cf_executor(runtime=self.runtime)
-        pw.map(self.__map_evaluate_parameters, self.parameters_list)
-        pw_res = pw.get_result()
+        # pw = pywren.ibm_cf_executor(runtime=self.runtime)
+        # pw.map(self.__map_evaluate_parameters, self.parameters_list)
+        # pw_res = pw.get_result()
         completion_time = time() - start
-        return {"Results": pw_res, "total_completion_time": completion_time}
+        return {"Results": results, "total_completion_time": completion_time}
 
     def __map_k_fold_cross_validation(self, params_dict, index):
 
