@@ -20,7 +20,7 @@ if __name__ == '__main__':
     """experiments 3 random search hyperparameters pywren"""
     number_of_sets = 2
     hyperparameters_sets = random_search(number_of_sets)
-    for model in ["ag_news"]:# , "dbpedia", "yelp"]:
+    for model in ["ag_news", "dbpedia", "yelp"]:
         results = []
         for i in range(2):
             """call for PyWren exaction with list of hyperparameters"""
