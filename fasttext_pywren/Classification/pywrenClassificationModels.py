@@ -1,5 +1,5 @@
 import fastText as fstTxt
-from ExecuterWrapper.executorWrapper import ExecutorWrap, Location
+from PwrenUtils.executorWrapper import ExecutorWrap, Location
 
 exe_location = Location.PYWREN
 

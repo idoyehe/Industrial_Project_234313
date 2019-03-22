@@ -2,8 +2,8 @@ import fastText as fstTxt
 from fasttext_pywren.HyperParametersEvaluate.localGenericHyperparameterEvaluate import *
 import csv
 
-models_names = {"dbpedia": "../Models/dbpedia/dbpedia.train",
-                "yelp": "../Models/yelp_review_full/yelp_review_full.train"}
+models_names = {"dbpedia": "../FastTextModels/dbpedia/dbpedia.train",
+                "yelp": "../FastTextModels/yelp_review_full/yelp_review_full.train"}
 
 
 def fastText_evaluate(train_path, test_path, hyperparameters_set):
