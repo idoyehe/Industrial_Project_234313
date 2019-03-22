@@ -55,7 +55,8 @@ if __name__ == '__main__':
     #     f.close()
 
     """experiments 2 random search hyperparameters"""
-    hyperparameters_sets = random_search(2)
+    number_of_sets = 2
+    hyperparameters_sets = random_search(number_of_sets)
     for model in ["ag_news", "dbpedia", "yelp"]:
         results = []
         for i in range(2):
@@ -68,7 +69,7 @@ if __name__ == '__main__':
                 parsed_results.append(
                     {"set_index": set_index, **set_res, 'total_completion_time': iteration_result['total_completion_time']})
 
-        f = open("./marc_experiments/exp_2_hyperSets_2_" + model + ".csv", 'w')
+        f = open("./marc_experiments/exp_2_hyperSets_" + str(number_of_sets) + "_" + model + ".csv", 'w')
         writer = csv.DictWriter(f, fieldnames=["set_index", "precision", "recall", "cpu_time", "total_completion_time"])
         writer.writeheader()
         writer.writerows(parsed_results)

@@ -1,10 +1,12 @@
 import fastText as fstTxt
 from fasttext_pywren.HyperParametersEvaluate import pywrenGenericHyperparameterEvaluate
 from fasttext_pywren.HyperParametersEvaluate.randomHyperparameters import random_search
-
+import csv
 bucket_name = 'fasttext-train-datasets'
 
 """evaluation model function instance"""
+
+
 def fastText_evaluate(train_path, test_path, hyperparameters_set):
     from time import time
     start = time()
@@ -14,13 +16,34 @@ def fastText_evaluate(train_path, test_path, hyperparameters_set):
     return {"precision": result[1], "recall": result[2], "cpu_time": end - start}
 
 
-"""call for PyWren exaction with list of hyperparameters"""
-hyperparameters = pywrenGenericHyperparameterEvaluate.PywrenHyperParameterUtil(fastText_evaluate,
-                                                                               bucket_name,
-                                                                               "ag_news",
-                                                                               job_name="fastText_hyperparameters_evaluate_ag_news",
-                                                                               local_graphs_path="../../InvocationsGraphsFiles/")
-hyperparameters.set_kvalue(5)
-hyperparameters.set_evaluation_keys(("precision", "recall", "cpu_time"))
-hyperparameters.set_parameters(random_search(10))
-print(hyperparameters.evaluate_params(runtime="fasttext-hyperparameters"))
+if __name__ == '__main__':
+    """experiments 3 random search hyperparameters pywren"""
+    number_of_sets = 2
+    hyperparameters_sets = random_search(number_of_sets)
+    for model in ["ag_news"]:# , "dbpedia", "yelp"]:
+        results = []
+        for i in range(2):
+            """call for PyWren exaction with list of hyperparameters"""
+            pywren_kcfv = pywrenGenericHyperparameterEvaluate.PywrenHyperParameterUtil(
+                fastText_evaluate,
+                bucket_name,
+                model,
+                job_name=model + "_number_of_sets_" + str(number_of_sets) + "_iter_" + str(i),
+                local_graphs_path="./InvocationsGraphsFiles/")
+
+            pywren_kcfv.set_kvalue(5)
+            pywren_kcfv.set_evaluation_keys(("precision", "recall", "cpu_time"))
+            pywren_kcfv.set_parameters(hyperparameters_sets)
+            results.append(pywren_kcfv.evaluate_params(runtime="fasttext-hyperparameters"))
+
+        parsed_results = []
+        for iteration_result in results:
+            for set_index, set_res in enumerate(iteration_result["results"]):
+                parsed_results.append(
+                    {"set_index": set_index, **set_res, 'total_completion_time': iteration_result['total_completion_time']})
+
+        f = open("./marc_experiments/exp_3_hyperSets_" + str(number_of_sets) + "_" + model + ".csv", 'w')
+        writer = csv.DictWriter(f, fieldnames=["set_index", "precision", "recall", "cpu_time", "total_completion_time"])
+        writer.writeheader()
+        writer.writerows(parsed_results)
+        f.close()
