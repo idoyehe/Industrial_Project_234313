@@ -40,3 +40,5 @@ CMD ["/bin/bash", "-c", "cd /pythonAction && python -u pythonrunner.py"]
 RUN mkdir -p /fasttext/package
 RUN git clone https://github.com/facebookresearch/fastText.git /fasttext/package/
 RUN pip install /fasttext/package/.
+
+RUN mkdir -p /hyperParametersKCFV/
