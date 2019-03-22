@@ -59,7 +59,7 @@ if __name__ == '__main__':
         hyperparameters_sets = random_search(number_of_sets)
         for model in ["ag_news", "dbpedia", "yelp"]:
             results = []
-            for i in range(2):
+            for i in range(10):
                 lkf = LocalKFoldCrossValidation(5, model, ("precision", "recall", "cpu_time"), fastText_evaluate)
                 results.append(lkf.hyperparameters_kfc_parallel(hyperparameters_sets))
 

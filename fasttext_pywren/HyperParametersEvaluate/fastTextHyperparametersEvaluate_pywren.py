@@ -22,7 +22,7 @@ if __name__ == '__main__':
         hyperparameters_sets = random_search(number_of_sets)
         for model in ["ag_news", "dbpedia", "yelp"]:
             results = []
-            for i in range(2):
+            for i in range(5):
                 """call for PyWren exaction with list of hyperparameters"""
                 pywren_kcfv = pywrenGenericHyperparameterEvaluate.PywrenHyperParameterUtil(
                     fastText_evaluate,
