@@ -34,7 +34,7 @@ def fastText_evaluate(train_path, test_path, hyperparameters_set):
     return {"precision": result[1], "recall": result[2], "cpu_time": end - start}
 
 
-"""experiments 1"""
+"""experiments 1 default hyperparameters"""
 if __name__ == '__main__':
     for model in ["ag_news", "dbpedia", "yelp"]:
         results = []
