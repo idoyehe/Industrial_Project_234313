@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats as scpy
-from ExecuterWrapper.executorWrapper import ExecutorWrap, Location
+from PwrenUtils.executorWrapper import ExecutorWrap, Location
 
 exe_location = Location.PYWREN
 MAP_INSTANCES = 1000
