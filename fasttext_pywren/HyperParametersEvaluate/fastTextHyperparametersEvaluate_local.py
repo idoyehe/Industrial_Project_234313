@@ -38,21 +38,21 @@ def fastText_evaluate(train_path, test_path, hyperparameters_set):
 
 if __name__ == '__main__':
     """experiments 1 default hyperparameters"""
-    for model in ["ag_news", "dbpedia", "yelp"]:
-        results = []
-        for i in range(10):
-            lkf = LocalKFoldCrossValidation(5, model, ("precision", "recall", "cpu_time"), fastText_evaluate)
-            results.append(lkf.hyperparameters_kfc_parallel())
-
-        parsed_results = []
-        for iteration_result in results:
-            parsed_results.append({**iteration_result["results"][0], 'total_completion_time': iteration_result['total_completion_time']})
-
-        f = open("./marc_experiments/exp_1_" + model + ".csv", 'w')
-        writer = csv.DictWriter(f, fieldnames=["precision", "recall", "cpu_time", "total_completion_time"])
-        writer.writeheader()
-        writer.writerows(parsed_results)
-        f.close()
+    # for model in ["ag_news", "dbpedia", "yelp"]:
+    #     results = []
+    #     for i in range(10):
+    #         lkf = LocalKFoldCrossValidation(5, model, ("precision", "recall", "cpu_time"), fastText_evaluate)
+    #         results.append(lkf.hyperparameters_kfc_parallel())
+    #
+    #     parsed_results = []
+    #     for iteration_result in results:
+    #         parsed_results.append({**iteration_result["results"][0], 'total_completion_time': iteration_result['total_completion_time']})
+    #
+    #     f = open("./marc_experiments/exp_1_" + model + ".csv", 'w')
+    #     writer = csv.DictWriter(f, fieldnames=["precision", "recall", "cpu_time", "total_completion_time"])
+    #     writer.writeheader()
+    #     writer.writerows(parsed_results)
+    #     f.close()
 
     """experiments 2 random search hyperparameters"""
     for number_of_sets in [5, 10, 20, 40, 80]:
