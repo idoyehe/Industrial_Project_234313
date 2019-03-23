@@ -55,9 +55,9 @@ if __name__ == '__main__':
     #     f.close()
 
     """experiments 2 random search hyperparameters"""
-    for number_of_sets in [5, 10, 20, 40, 80]:
+    for number_of_sets in [20, 40, 80]:
         hyperparameters_sets = random_search(number_of_sets)
-        for model in ["ag_news", "dbpedia", "yelp"]:
+        for model in ["ag_news"]:  # , "dbpedia", "yelp"]:
             results = []
             for i in range(5):
                 lkf = LocalKFoldCrossValidation(5, model, ("precision", "recall", "cpu_time"), fastText_evaluate)
