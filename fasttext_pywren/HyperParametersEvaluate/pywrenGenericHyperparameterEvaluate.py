@@ -1,6 +1,5 @@
 import pywren_ibm_cloud as pywren
 import types
-from os import path
 from time import time
 
 
