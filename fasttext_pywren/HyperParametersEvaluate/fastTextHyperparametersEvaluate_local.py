@@ -39,39 +39,18 @@ def fastText_evaluate(queue, train_path, test_path, hyperparameters_set):
 
 if __name__ == '__main__':
     """experiments 1 default hyperparameters"""
-    # for model in ["ag_news", "dbpedia", "yelp"]:
-    #     results = []
-    #     for i in range(10):
-    #         lkf = LocalKFoldCrossValidation(5, model, ("precision", "recall", "cpu_time"), fastText_evaluate)
-    #         results.append(lkf.hyperparameters_kfc_parallel())
-    #
-    #     parsed_results = []
-    #     for iteration_result in results:
-    #         parsed_results.append({**iteration_result["results"][0], 'total_completion_time': iteration_result['total_completion_time']})
-    #
-    #     f = open("./marc_experiments/exp_1_" + model + ".csv", 'w')
-    #     writer = csv.DictWriter(f, fieldnames=["precision", "recall", "cpu_time", "total_completion_time"])
-    #     writer.writeheader()
-    #     writer.writerows(parsed_results)
-    #     f.close()
+    for model in ["ag_news", "dbpedia", "yelp"]:
+        results = []
+        for i in range(10):
+            lkf = LocalKFoldCrossValidation(5, model, ("precision", "recall", "cpu_time"), fastText_evaluate)
+            results.append(lkf.hyperparameters_kfc_parallel())
 
-    """experiments 2 random search hyperparameters"""
-    for number_of_sets in [10]:
-        hyperparameters_sets = random_search(number_of_sets)
-        for model in ["dbpedia", "yelp"]:
-            results = []
-            for i in range(5):
-                lkf = LocalKFoldCrossValidation(5, model, ("precision", "recall", "cpu_time"), fastText_evaluate)
-                results.append(lkf.hyperparameters_kfc_parallel(hyperparameters_sets))
+        parsed_results = []
+        for iteration_result in results:
+            parsed_results.append({**iteration_result["results"][0], 'total_completion_time': iteration_result['total_completion_time']})
 
-            parsed_results = []
-            for iteration_result in results:
-                for set_index, set_res in enumerate(iteration_result["results"]):
-                    parsed_results.append(
-                        {"set_index": set_index, **set_res, 'total_completion_time': iteration_result['total_completion_time']})
-
-            f = open("./marc_experiments/exp_2_hyperSets_" + str(number_of_sets) + "_" + model + ".csv", 'w')
-            writer = csv.DictWriter(f, fieldnames=["set_index", "precision", "recall", "cpu_time", "total_completion_time"])
-            writer.writeheader()
-            writer.writerows(parsed_results)
-            f.close()
+        f = open("./marc_experiments/exp_1_" + model + ".csv", 'w')
+        writer = csv.DictWriter(f, fieldnames=["precision", "recall", "cpu_time", "total_completion_time"])
+        writer.writeheader()
+        writer.writerows(parsed_results)
+        f.close()

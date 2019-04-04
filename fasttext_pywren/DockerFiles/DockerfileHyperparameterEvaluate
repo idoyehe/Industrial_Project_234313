@@ -1,6 +1,6 @@
 # Copied from: https://github.com/ibm-functions/runtime-python/tree/master/python3.6
 
-FROM python:3.6-slim-jessie
+FROM openwhisk/actionloop-python-v3.7:6879887
 
 ENV FLASK_PROXY_PORT 8080
 

@@ -69,6 +69,8 @@ class PywrenHyperParameterUtil(object):
         total_completion_time = time() - start
         if self.job_name and self.local_graphs_path:
             pywren_executor.create_timeline_plots(dst=self.local_graphs_path, name=self.job_name)
+        if not isinstance(pywren_results, list):  # wrapped in list for single evaluation
+            pywren_results = [pywren_results]
         return {"results": pywren_results, "total_completion_time": total_completion_time}
 
     def __map_evaluate_hyperparameters(self, parameters_dict, ibm_cos):
