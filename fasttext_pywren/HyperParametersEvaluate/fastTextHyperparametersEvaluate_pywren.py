@@ -34,7 +34,7 @@ if __name__ == '__main__':
             pywren_kcfv.set_evaluation_keys(("precision", "recall", "cpu_time"))
             pywren_kcfv.set_parameters([[{}]])
             print("model is: " + model + ", iteration #: " + str(i))
-            results.append(pywren_kcfv.evaluate_params(runtime="idoye/fasttext-hyperparameters_3.7"))
+            results.append(pywren_kcfv.evaluate_params(runtime="idoye/fasttext-hyperparameters-v3.7"))
         parsed_results = []
         for iteration_result in results:
             parsed_results.append({**iteration_result["results"][0], 'total_completion_time': iteration_result['total_completion_time']})
@@ -63,7 +63,7 @@ if __name__ == '__main__':
                 pywren_kcfv.set_evaluation_keys(("precision", "recall", "cpu_time"))
                 pywren_kcfv.set_parameters(hyperparameters_sets)
                 print("model is: " + model + " # sets is: " + str(number_of_sets) + ", iteration #: " + str(i))
-                results.append(pywren_kcfv.evaluate_params(runtime="idoye/fasttext-hyperparameters"))
+                results.append(pywren_kcfv.evaluate_params(runtime="idoye/fasttext-hyperparameters-v3.7"))
 
             parsed_results = []
             for iteration_result in results:
