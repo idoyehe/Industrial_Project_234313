@@ -47,9 +47,10 @@ class PywrenHyperParameterUtil(object):
 
         self.hyperparameters_list = hyperparameters_list
 
-    def evaluate_params(self, runtime="pywren_3.6"):
+    def evaluate_params(self, runtime: str = "ibmcloudfunction/action-pywren-v3.6", runtime_memory: int = 2048):
         """
         :param runtime: the action in cloud to invoke
+        :param runtime_memory: memory to use in the runtime
         :return: a dict that has 2 keys:
             Results list of evaluation of all set of parameters
             Duration the time takes to PyWren for execution
@@ -62,7 +63,7 @@ class PywrenHyperParameterUtil(object):
 
         self.runtime = runtime
         start = time()
-        pywren_executor = pywren.ibm_cf_executor(runtime=self.runtime, runtime_memory=2048)
+        pywren_executor = pywren.ibm_cf_executor(runtime=self.runtime, runtime_memory=runtime_memory)
         pywren_executor.map(self.__map_evaluate_hyperparameters, self.hyperparameters_list)
         pywren_results = pywren_executor.get_result()
         total_completion_time = time() - start

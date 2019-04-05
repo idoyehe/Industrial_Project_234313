@@ -19,7 +19,7 @@ def fastText_evaluate(train_path, test_path, hyperparameters_set):
 
 if __name__ == '__main__':
     """experiments 1 default hyperparameters"""
-    for model in ["ag_news", "dbpedia", "yelp"]:
+    for model in ["ag_news", "dbpedia"]:  # , "yelp"]: causing out of memory
         results = []
         for i in range(10):
             """call for PyWren exaction with list of hyperparameters"""
@@ -47,7 +47,7 @@ if __name__ == '__main__':
     """experiments 2 random search hyperparameters pywren"""
     for number_of_sets in [1, 5, 25, 50, 75]:  # , 10, 20, 40, 80]:
         hyperparameters_sets = random_search(number_of_sets)
-        for model in ["ag_news", "dbpedia", "yelp"]:
+        for model in ["ag_news", "dbpedia"]:  # , "yelp"]: causing out of memory
             results = []
             for i in range(5):
                 """call for PyWren exaction with list of hyperparameters"""
@@ -61,7 +61,7 @@ if __name__ == '__main__':
                 pywren_kcfv.set_kvalue(5)
                 pywren_kcfv.set_evaluation_keys(("precision", "recall", "cpu_time"))
                 pywren_kcfv.set_parameters(hyperparameters_sets)
-                results.append(pywren_kcfv.evaluate_params(runtime="idoye/fasttext-hyperparameters"))
+                results.append(pywren_kcfv.evaluate_params(runtime="idoye/fasttext-hyperparameters_3.7"))
 
             parsed_results = []
             for iteration_result in results:
