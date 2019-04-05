@@ -62,7 +62,7 @@ class PywrenHyperParameterUtil(object):
 
         self.runtime = runtime
         start = time()
-        pywren_executor = pywren.ibm_cf_executor(runtime=self.runtime)
+        pywren_executor = pywren.ibm_cf_executor(runtime=self.runtime, runtime_memory=2048)
         pywren_executor.map(self.__map_evaluate_hyperparameters, self.hyperparameters_list)
         pywren_results = pywren_executor.get_result()
         total_completion_time = time() - start
