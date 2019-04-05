@@ -84,15 +84,15 @@ class PywrenHyperParameterUtil(object):
             cos_train_file = ibm_cos.get_object(Bucket=self.bucket_name, Key=cos_train_key)
             cos_test_file = ibm_cos.get_object(Bucket=self.bucket_name, Key=cos_test_key)
 
-            dec = lambda l: l.decode('utf-8')
+            dec = lambda l: l.decode('utf-8') + '\n'
 
             local_train_file = cos_train_file['Body'].read().splitlines()
             local_train_file = list(map(dec, local_train_file))
             local_test_file = cos_test_file['Body'].read().splitlines()
             local_test_file = list(map(dec, local_test_file))
 
-            train_file = open(self.path_docker_default + cos_train_key, 'w')
-            test_file = open(self.path_docker_default + cos_test_key, 'w')
+            train_file = open(local_train_key, 'w')
+            test_file = open(local_test_key, 'w')
             train_file.writelines(local_train_file)
             test_file.writelines(local_test_file)
             test_file.close()
@@ -102,7 +102,7 @@ class PywrenHyperParameterUtil(object):
         def __reducer_average_validator_wrap(results):
             k_cross_valid_dict = {}
             for key in self.evaluate_keys:  # initialize all sums to 0
-                k_cross_valid_dict[key] = 0
+                k_cross_valid_dict[key] = 0.0
 
             for res in results:
                 for key in self.evaluate_keys:  # adding to all sums
