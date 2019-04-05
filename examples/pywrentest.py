@@ -8,6 +8,6 @@ def my_function(x):
     return x + 7
 
 if __name__ == '__main__':
-    pw = pywren.ibm_cf_executor()
+    pw = pywren.ibm_cf_executor(runtime_memory=2048)
     pw.call_async(my_function, 3)
     print (pw.get_result())
