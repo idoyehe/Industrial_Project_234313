@@ -18,6 +18,7 @@ class PywrenHyperParameterUtil(object):
         self.evaluate_keys = None
         self.total_completion_time = "total_completion_time"
         self.runtime = None
+        self.runtime_memory = None
 
     def set_kvalue(self, mew_k_value: int):
         """
@@ -62,8 +63,9 @@ class PywrenHyperParameterUtil(object):
             raise Exception("Please call to set evaluation keys method and try again")
 
         self.runtime = runtime
+        self.runtime_memory = runtime_memory
         start = time()
-        pywren_executor = pywren.ibm_cf_executor(runtime=self.runtime, runtime_memory=runtime_memory)
+        pywren_executor = pywren.ibm_cf_executor(runtime=self.runtime, runtime_memory=self.runtime_memory)
         pywren_executor.map(self.__map_evaluate_hyperparameters, self.hyperparameters_list)
         pywren_results = pywren_executor.get_result()
         total_completion_time = time() - start
@@ -113,10 +115,10 @@ class PywrenHyperParameterUtil(object):
                 k_cross_valid_dict[key] /= len(results)
             return k_cross_valid_dict
 
-        nested_pywren_executor = pywren.ibm_cf_executor(runtime=self.runtime)
-        nested_pywren_executor.map_reduce(__k_fold_cross_validation_wrap,
-                                          folds_indexes,
-                                          __reducer_average_validator_wrap,
+        nested_pywren_executor = pywren.ibm_cf_executor(runtime=self.runtime, runtime_memory=self.runtime_memory)
+        nested_pywren_executor.map_reduce(map_function=__k_fold_cross_validation_wrap,
+                                          map_iterdata=folds_indexes,
+                                          reduce_function=__reducer_average_validator_wrap,
                                           reducer_wait_local=False)
         nested_pywren_results = nested_pywren_executor.get_result()
         return nested_pywren_results
