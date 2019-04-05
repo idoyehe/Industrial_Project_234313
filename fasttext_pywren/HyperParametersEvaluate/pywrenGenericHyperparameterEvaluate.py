@@ -116,9 +116,8 @@ class PywrenHyperParameterUtil(object):
             return k_cross_valid_dict
 
         nested_pywren_executor = pywren.ibm_cf_executor(runtime=self.runtime, runtime_memory=self.runtime_memory)
-        nested_pywren_executor.map_reduce(map_function=__k_fold_cross_validation_wrap,
-                                          map_iterdata=folds_indexes,
-                                          reduce_function=__reducer_average_validator_wrap,
-                                          reducer_wait_local=False)
+        nested_pywren_executor.map(map_function=__k_fold_cross_validation_wrap,
+                                          map_iterdata=folds_indexes)
         nested_pywren_results = nested_pywren_executor.get_result()
-        return nested_pywren_results
+
+        return __reducer_average_validator_wrap(nested_pywren_results)
