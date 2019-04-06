@@ -46,9 +46,9 @@ if __name__ == '__main__':
     #     f.close()
 
     """experiments 2 random search hyperparameters pywren"""
-    for number_of_sets in [20, 40]:  # 50, 75]:
+    for number_of_sets in [5, 10, 20, 40]:
         hyperparameters_sets = random_search(number_of_sets)
-        for model in ["ag_news", "dbpedia"]:  # , "yelp"]: causing out of memory
+        for model in ["ag_news", "dbpedia", "yelp"]:
             results = []
             for i in range(5):
                 """call for PyWren exaction with list of hyperparameters"""
